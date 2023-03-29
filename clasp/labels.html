@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Check Out</title>
+		<style>
+			@import url('https://fonts.googleapis.com/css2?family=Raleway:wght@200;300;400;500;600;700;800&display=swap');
+
+			:root {
+				--white-color: #ffffff;
+				--cream-color: #efe3c7;
+				--orange-color: #cc973d;
+				--red-color: #c14a4a;
+				--pine-color: #6c782c;
+				--blue-color: #45707a;
+				--green-color: #4c7a5d;
+				--purple-color: #945e80;
+				font-family: 'Raleway', sans-serif;
+			}
+
+			body {
+				margin: 0;
+				padding: 0;
+				width: 100%;
+				height: 100%;
+				display: flex;
+				flex-direction: column;
+				justify-content: center;
+				align-items: center;
+				gap: 3rem;
+			}
+
+			.value {
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				width: 10rem;
+				aspect-ratio: 3/1;
+				background-color: var(--cream-color);
+				border: 0.25rem solid var(--orange-color);
+				border-radius: 2rem;
+				font-size: 1.25rem;
+			}
+
+			#firstValue > a,
+			#secondValue > a {
+				text-decoration: none;
+				color: var(--red-color);
+			}
+
+			#nextQuery {
+				width: 10rem;
+				height: 3rem;
+				background-color: var(--cream-color);
+				border: 0.25rem solid var(--purple-color);
+				border-radius: 2rem;
+				font-size: 1.25rem;
+				color: var(--purple-color);
+				cursor: pointer;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="firstValue"></div>
+		<div id="secondValue"></div>
+		<button id="nextQuery" onclick="nextQuery()">Next Query</button>
+		<script>
+			const {firstLabel, secondLabel} = JSON.parse(<?= JSON.stringify(labels) ?>);
+			console.log(`${firstLabel}
+
+			   ${secondLabel}`);
+			function setValues() {
+				const firstValue = document.querySelector('#firstValue');
+				firstValue.innerHTML = `<a href="${firstLabel}">Label 1</a>`;
+				firstValue.classList.add('value');
+				console.log(secondLabel);
+				if (!secondLabel) return;
+				const secondValue = document.querySelector('#secondValue');
+				secondValue.innerHTML = `<a href="${secondLabel}">Label 2</a>`;
+				secondValue.classList.add('value');
+			}
+			window.onload = setValues;
+
+			function nextQuery() {
+				google.script.run
+					.withSuccessHandler((response) => {
+						console.log(`Success: ${response}`);
+					})
+					.withFailureHandler((response) => {
+						console.log(`Failure: ${response}`);
+					})
+					.checkOut();
+				google.script.host.close();
+			}
+		</script>
+	</body>
+</html>
+

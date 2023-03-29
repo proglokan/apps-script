@@ -1,0 +1,1060 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Order Checklist</title>
+		<style>
+			html,
+			body,
+			div,
+			span,
+			applet,
+			object,
+			iframe,
+			h1,
+			h2,
+			h3,
+			h4,
+			h5,
+			h6,
+			p,
+			blockquote,
+			pre,
+			a,
+			abbr,
+			acronym,
+			address,
+			big,
+			cite,
+			code,
+			del,
+			dfn,
+			em,
+			img,
+			ins,
+			kbd,
+			q,
+			s,
+			samp,
+			small,
+			strike,
+			strong,
+			sub,
+			sup,
+			tt,
+			var,
+			b,
+			u,
+			i,
+			center,
+			dl,
+			dt,
+			dd,
+			ol,
+			ul,
+			li,
+			fieldset,
+			form,
+			label,
+			legend,
+			table,
+			caption,
+			tbody,
+			tfoot,
+			thead,
+			tr,
+			th,
+			td,
+			article,
+			aside,
+			canvas,
+			details,
+			embed,
+			figure,
+			figcaption,
+			footer,
+			header,
+			hgroup,
+			menu,
+			nav,
+			output,
+			ruby,
+			section,
+			summary,
+			time,
+			mark,
+			audio,
+			video {
+				margin: 0;
+				padding: 0;
+				border: 0;
+				font-size: 100%;
+				font: inherit;
+				vertical-align: baseline;
+			}
+
+			/* HTML5 display-role reset for older browsers */
+			article,
+			aside,
+			details,
+			figcaption,
+			figure,
+			footer,
+			header,
+			hgroup,
+			menu,
+			nav,
+			section {
+				display: block;
+			}
+
+			body {
+				line-height: 1;
+			}
+
+			ol,
+			ul {
+				list-style: none;
+			}
+
+			blockquote,
+			q {
+				quotes: none;
+			}
+
+			blockquote:before,
+			blockquote:after,
+			q:before,
+			q:after {
+				content: '';
+				content: none;
+			}
+
+			table {
+				border-collapse: collapse;
+				border-spacing: 0;
+			}
+
+			@import url('https://fonts.googleapis.com/css2?family=Raleway:wght@200;300;400;500;600;700;800&display=swap');
+
+			:root {
+				--white-color: #ffffff;
+				--cream-color: #efe3c7;
+				--orange-color: #cc973d;
+				--red-color: #c14a4a;
+				--pine-color: #6c782c;
+				--blue-color: #45707a;
+				--green-color: #4c7a5d;
+				--purple-color: #945e80;
+				font-family: 'Raleway', sans-serif;
+			}
+
+			html,
+			body {
+				position: relative;
+				background-color: var(--white-color);
+			}
+
+			#coverContent {
+				position: absolute;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: 100%;
+				background-color: #fff;
+				z-index: -1;
+			}
+
+			#form {
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				gap: 2rem;
+				margin: 2rem 0;
+			}
+
+			#form > * {
+				width: 80%;
+			}
+
+			.productTitle,
+			.productOrderID > p:first-of-type {
+				font-size: 2rem;
+				font-weight: bold;
+				color: var(--red-color);
+			}
+
+			.productTitle,
+			.productOrderID {
+				display: flex;
+				flex-direction: column;
+				gap: 1rem;
+				align-items: center;
+			}
+
+			#productTitle {
+				min-width: 40%;
+				max-width: 80%;
+				height: 2.5rem;
+				border-radius: 7px;
+				border: 3px solid var(--orange-color);
+				background-color: var(--cream-color);
+				font-size: 1.2rem;
+				padding: 0 10px;
+				color: var(--orange-color);
+				font-weight: 600;
+			}
+
+			.productOrderID {
+				border-bottom: 3px solid var(--cream-color);
+				padding-bottom: 2rem;
+			}
+
+			.orderID,
+			.productQuantity > p:first-of-type,
+			.fragile > p,
+			.packagingSection > p,
+			.weight > p,
+			.case > p {
+				font-size: 1.2rem;
+				font-weight: 600;
+				color: var(--orange-color);
+			}
+
+			.productQuantity,
+			.fragile,
+			.packagingSection,
+			.weight,
+			.case {
+				display: flex;
+				flex-direction: column;
+				gap: 0.5rem;
+				align-items: center;
+			}
+
+			.fragile label,
+			.quantity,
+			.packagingSection label,
+			.weight div {
+				color: var(--green-color);
+				font-weight: 600;
+			}
+
+			.packagingSection > div:first-of-type {
+				display: grid;
+				grid-template-columns: 1fr 1fr;
+				row-gap: 0.5rem;
+			}
+
+			#boxDropdown {
+				width: 14rem;
+				height: 2rem;
+				border-radius: 7px;
+				border: 3px solid var(--orange-color);
+				background-color: var(--cream-color);
+				font-size: 1rem;
+				padding: 0 10px;
+				color: var(--green-color);
+				font-weight: 600;
+				text-align: center;
+				outline: none;
+			}
+
+			.weight > div {
+				display: flex;
+				align-items: center;
+				gap: 1rem;
+			}
+
+			.weight .buttons {
+				display: grid;
+				grid-template-columns: 1fr 1fr 1fr;
+				gap: 0.5rem;
+			}
+
+			#addWeightOuter {
+				width: 1.375rem;
+				height: 1.375rem;
+				border: 0.2rem solid var(--green-color);
+				border-radius: 2rem;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				justify-content: center;
+				cursor: pointer;
+			}
+
+			#addWeightInner {
+				color: var(--green-color);
+				font-size: 2rem;
+				font-weight: 400;
+			}
+
+			#secondWeight {
+				display: none;
+				padding: 0.125rem 0 0.125rem 0;
+				text-align: center;
+				border-left: 0.25rem solid var(--orange-color);
+				width: 75%;
+				font-style: italic;
+				color: var(--green-color);
+				background-color: var(--cream-color);
+			}
+
+			.warning {
+				display: none;
+				text-align: center;
+				padding: 0.5rem 0 0.5rem 0;
+				border-radius: 0.5rem;
+				border: 0.125rem solid var(--red-color);
+				width: 75%;
+				font-style: italic;
+				font-weight: 700;
+				color: var(--red-color);
+				background-color: rgba(193, 74, 74, 0.486);
+			}
+
+			.buttons button {
+				background-color: var(--cream-color);
+				color: var(--green-color);
+				border-radius: 5px;
+				border: 3px solid var(--orange-color);
+				width: 4rem;
+				height: 2rem;
+				font-weight: 600;
+			}
+
+			#case {
+				width: 20rem;
+				height: 2rem;
+				border-radius: 7px;
+				border: 3px solid var(--orange-color);
+				background-color: var(--cream-color);
+				font-size: 1rem;
+				padding: 0 10px;
+				color: var(--green-color);
+				font-weight: 600;
+				text-align: center;
+			}
+
+			#form > button {
+				width: 12rem;
+				height: 3rem;
+				font-size: 1.2rem;
+				color: var(--red-color);
+				font-weight: bold;
+				border-radius: 7px;
+				border: 3px solid var(--orange-color);
+				background-color: var(--cream-color);
+			}
+
+			select:enabled,
+			input,
+			label,
+			button {
+				cursor: pointer;
+			}
+
+			input[type='radio'] {
+				-webkit-appearance: none;
+				-moz-appearance: none;
+				appearance: none;
+
+				border-radius: 50%;
+				width: 1rem;
+				height: 1rem;
+
+				border: 2px solid var(--orange-color);
+				background-color: var(--cream-color);
+				transition: 0.2s all linear;
+				position: relative;
+				top: 0.15rem;
+			}
+
+			input:checked {
+				border: 0.5rem solid var(--orange-color);
+				outline: unset !important;
+			}
+
+			#targetContent {
+				width: 0;
+				aspect-ratio: 4/6;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+			}
+
+			#barcode {
+				/* transform: rotate(90deg); */
+        width: 95%;
+				border: 0.25rem solid black;
+				border-radius: 1rem;
+				padding: 1rem 0 1rem 0;
+			}
+
+			::-webkit-scrollbar {
+				width: 0.75rem;
+				background: var(--white-color);
+			}
+
+			::-webkit-scrollbar-thumb {
+				background: var(--purple-color);
+				border-radius: 1rem;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div id="coverContent"></div>
+		<div id="form">
+			<div class="productTitle">
+				<p>Product Title:</p>
+				<select name="productTitle" id="productTitle"></select>
+			</div>
+			<div class="productOrderID">
+				<p>Order ID:</p>
+				<p class="orderID"></p>
+			</div>
+			<div class="productQuantity">
+				<p>Quantity:</p>
+				<p class="quantity"></p>
+			</div>
+
+			<div class="fragile">
+				<p>Fragile?:</p>
+				<div>
+					<input type="radio" id="yes" name="fragile" value="yes" />
+					<label for="yes">Yes</label>
+					<input type="radio" id="no" name="fragile" value="no" />
+					<label for="no">No</label>
+				</div>
+				<small class="warning" id="fragileWarning"
+					>Please select `Yes` or `No`</small
+				>
+			</div>
+
+			<div class="packagingSection">
+				<p>Packaging:</p>
+				<div>
+					<div>
+						<input
+							class="packageRadio"
+							type="radio"
+							id="asis"
+							name="packaging"
+							value="asis"
+							required
+						/>
+						<label for="asis">As is</label>
+					</div>
+					<div>
+						<input
+							class="packageRadio"
+							type="radio"
+							id="tripleZero"
+							name="packaging"
+							value="000"
+							required
+						/>
+						<label for="tripleZero">000</label>
+					</div>
+					<div>
+						<input
+							class="packageRadio"
+							type="radio"
+							id="three"
+							name="packaging"
+							value="3"
+							required
+						/>
+						<label for="three">3</label>
+					</div>
+					<div>
+						<input
+							class="packageRadio"
+							type="radio"
+							id="bb3"
+							name="packaging"
+							value="BB3"
+							required
+						/>
+						<label for="bb3">BB3</label>
+					</div>
+					<div>
+						<input
+							class="packageRadio"
+							type="radio"
+							id="five"
+							name="packaging"
+							value="5"
+							required
+						/>
+						<label for="five">5</label>
+					</div>
+					<div>
+						<input
+							class="packageRadio"
+							type="radio"
+							id="bb5"
+							name="packaging"
+							value="BB5"
+							required
+						/>
+						<label for="bb5">BB5</label>
+					</div>
+					<div>
+						<input
+							class="packageRadio"
+							type="radio"
+							id="seven"
+							name="packaging"
+							value="7"
+							required
+						/>
+						<label for="seven">7</label>
+					</div>
+					<div>
+						<input
+							class="packageRadio"
+							type="radio"
+							id="bb7"
+							name="packaging"
+							value="BB7"
+							required
+						/>
+						<label for="bb7">BB7</label>
+					</div>
+					<div>
+						<input
+							class="packageRadio"
+							type="radio"
+							id="bb9"
+							name="packaging"
+							value="BB9"
+							required
+						/>
+						<label for="bb9">BB9</label>
+					</div>
+					<div>
+						<input
+							class="packageRadio"
+							type="radio"
+							id="bb24"
+							name="packaging"
+							value="BB24"
+							required
+						/>
+						<label for="bb24">BB24</label>
+					</div>
+				</div>
+				<div>
+					<input
+						class="packageRadio"
+						type="radio"
+						id="box"
+						name="packaging"
+						value="box"
+						required
+					/>
+					<label for="box">Box</label>
+				</div>
+				<select name="boxDropdown" id="boxDropdown" disabled>
+					<option value="null">--</option>
+					<option value="7x7x7">B7 → 7x7x7</option>
+					<option value="10x10x10">B10 → 10x10x10</option>
+					<option value="12x8x8">B12s → 12x8x8</option>
+					<option value="12x12x12">B12m → 12x12x12</option>
+					<option value="18x12x8">M18s → 18x12x8</option>
+					<option value="18x18x16">M18m → 18x18x16</option>
+					<option value="18x18x24">M18l → 18x18x24</option>
+					<option value="24x24x24">M24 → 24x24x24</option>
+				</select>
+				<small class="warning" id="packageMapWarning"
+					>Package map cannot be blank</small
+				>
+			</div>
+
+			<div class="weight">
+				<p>Weight:</p>
+				<div>
+					<p><span class="oz">0</span> oz</p>
+					<div class="buttons">
+						<button class="increase1">+1 oz</button>
+						<button class="increase5">+5 oz</button>
+						<button class="increase16">+16 oz</button>
+						<button class="decrease1">-1 oz</button>
+						<button class="decrease5">-5 oz</button>
+						<button class="decrease16">-16 oz</button>
+					</div>
+					<span id="addWeightOuter" onclick="addWeight()">
+						<span id="addWeightInner">+</span>
+					</span>
+				</div>
+				<small id="secondWeight"></small>
+				<small class="warning" id="weightWarning">Weight cannot be `0`</small>
+			</div>
+
+			<div id="targetContent"></div>
+			<button onclick="generateBarcode()" id="barcodeBtn">
+				Generate Barcode
+			</button>
+
+			<div class="case">
+				<p>(In development) Case:</p>
+				<select name="case" id="case">
+					<option value="null">--</option>
+					<option value="quantity">Quantity</option>
+					<option value="damaged">Damaged</option>
+					<option value="notFound">Not Found</option>
+					<option value="instances">Instance !== received</option>
+				</select>
+			</div>
+
+			<button onclick="checklistSubmission()">Submit</button>
+		</div>
+
+		<script>
+			// case handling
+			class Case {
+				constructor(caseType, order) {
+					this.caseType = caseType;
+					this.order = order;
+				}
+			}
+
+			const orders = JSON.parse(<?= JSON.stringify(orders) ?>);
+			// All that good logic
+
+			function displayProducts(arr) {
+				// displays all products in product title dropdown
+				const productDropdown = document.querySelector('#productTitle');
+				arr.forEach((product, idx) => {
+					const option = document.createElement('option');
+					option.value = idx;
+					option.textContent = product.productName;
+					productDropdown.appendChild(option);
+				});
+			}
+
+			function displayFirstOrderOnLoad() {
+				// On page load, display the first order on the page
+				const order = orders[0];
+				displayOrderID(order);
+				displayQuantity(order);
+				displayFragile(order);
+				displayPackaging(order);
+				displayWeight(order);
+			}
+
+			function displayOrder(e) {
+				// On product dropdown change, display the order on the page
+				const index = e.target.value;
+				const order = orders[index];
+				displayOrderID(order);
+				displayQuantity(order);
+				displayFragile(order);
+				displayPackaging(order);
+				displayWeight(order);
+			}
+
+			function displayOrderID(order) {
+				// Display the order ID on the page
+				const orderID = document.querySelector('.orderID');
+				orderID.textContent = order.query;
+			}
+
+			function displayQuantity(order) {
+				// Display the quantity on the page
+				const quantity = document.querySelector('.quantity');
+				quantity.textContent = order.quantity;
+			}
+
+			function displayFragile(order) {
+				// Checks one of the fragile input checkboxes
+				if (order.fragile) {
+					const fragile = document.querySelector('#yes');
+					fragile.checked = true;
+				} else if (order.fragile === false) {
+					const fragile = document.querySelector('#no');
+					fragile.checked = true;
+				} else {
+					const yes = document.querySelector('#yes');
+					const no = document.querySelector('#no');
+					no.checked = false;
+					yes.checked = false;
+				}
+			}
+
+			function displayPackaging(order) {
+				// Checks one of the packaging input checkboxes
+				const asIsInput = document.querySelector('#asis');
+				const tripleZeroInput = document.querySelector('#tripleZero');
+				const threeInput = document.querySelector('#three');
+				const bb3Input = document.querySelector('#bb3');
+				const fiveInput = document.querySelector('#five');
+				const bb5Input = document.querySelector('#bb5');
+				const sevenInput = document.querySelector('#seven');
+				const bb7Input = document.querySelector('#bb7');
+				const bb9Input = document.querySelector('#bb9');
+				const bb24Input = document.querySelector('#bb24');
+				const boxInput = document.querySelector('#box');
+				const boxDropdown = document.querySelector('#boxDropdown');
+				document
+					.querySelector('#boxDropdown')
+					.getElementsByTagName('option')[0].selected = true;
+				const val = order.packageMap;
+				switch (true) {
+					case val === 'asis':
+						asIsInput.checked = true;
+						boxDropdown.disabled = true;
+						break;
+					case val === '000':
+						tripleZeroInput.checked = true;
+						boxDropdown.disabled = true;
+						break;
+					case val === '3':
+						threeInput.checked = true;
+						boxDropdown.disabled = true;
+						break;
+					case val === 'BB3':
+						bb3Input.checked = true;
+						boxDropdown.disabled = true;
+						break;
+					case val === '5':
+						fiveInput.checked = true;
+						boxDropdown.disabled = true;
+						break;
+					case val === 'BB5':
+						bb5Input.checked = true;
+						boxDropdown.disabled = true;
+						break;
+					case val === '7':
+						sevenInput.checked = true;
+						boxDropdown.disabled = true;
+						break;
+					case val === 'BB7':
+						bb7Input.checked = true;
+						boxDropdown.disabled = true;
+						break;
+					case val === 'BB9':
+						bb9Input.checked = true;
+						boxDropdown.disabled = true;
+						break;
+					case val === 'BB24':
+						bb24Input.checked = true;
+						boxDropdown.disabled = true;
+						break;
+					case val !== null && val.indexOf('x') !== -1:
+						boxInput.checked = true;
+						boxDropdown.disabled = false;
+						displayBoxPackaging(order);
+						break;
+					default:
+            asIsInput.checked = false;
+						tripleZeroInput.checked = false;
+						bb9Input.checked = false;
+						threeInput.checked = false;
+						bb3Input.checked = false;
+						fiveInput.checked = false;
+						bb5Input.checked = false;
+						sevenInput.checked = false;
+						bb7Input.checked = false;
+            bb24Input.checked = false;
+						boxInput.checked = false;
+						boxDropdown.disabled = true;
+				}
+			}
+
+			function displayBoxPackaging(order) {
+				const dropdownVals = {
+					'--': 0,
+					'7x7x7': 1,
+					'10x10x10': 2,
+					'12x8x8': 3,
+					'12x12x12': 4,
+					'18x12x8': 5,
+					'18x18x16': 6,
+					'18x18x24': 7,
+					'24x24x24': 8,
+				};
+				const optionIndex = dropdownVals[order.packageMap];
+				const option = document
+					.querySelector('#boxDropdown')
+					.getElementsByTagName('option')[optionIndex];
+				option.selected = true;
+			}
+
+			function enableBoxInput(e) {
+				// Enables and disables box dropdown
+				const boxDropdown = document.querySelector('#boxDropdown');
+				if (e.target.value === 'box') {
+					boxDropdown.disabled = false;
+				} else {
+					boxDropdown.disabled = true;
+				}
+			}
+
+			function displayWeight(order) {
+				// Displays package weight on page
+				const weight = document.querySelector('.oz');
+				if (!order.weight) {
+					weight.textContent = '0';
+					return;
+				} else {
+					const correctWeight = order.weight.split(' ')[0];
+					weight.textContent = correctWeight;
+				}
+			}
+
+			function increaseWeightBy1(e) {
+				// +1 button
+				e.preventDefault();
+				const weight = document.querySelector('.oz');
+				weight.textContent = parseInt(weight.textContent) + 1;
+			}
+
+			function increaseWeightBy5(e) {
+				// +5 button
+				e.preventDefault();
+				const weight = document.querySelector('.oz');
+				weight.textContent = parseInt(weight.textContent) + 5;
+			}
+
+			function increaseWeightBy16(e) {
+				// +16 button
+				e.preventDefault();
+				const weight = document.querySelector('.oz');
+				weight.textContent = parseInt(weight.textContent) + 16;
+			}
+
+			function decreaseWeightBy1(e) {
+				// -1 button
+				e.preventDefault();
+				const weight = document.querySelector('.oz');
+				if (weight.textContent === '0') return;
+				weight.textContent = parseInt(weight.textContent) - 1;
+			}
+
+			function decreaseWeightBy5(e) {
+				// -5 button
+				e.preventDefault();
+				const weight = document.querySelector('.oz');
+				const weightVal = weight.textContent;
+				const nums = ['1', '2', '3', '4'];
+				if (weightVal == '0') return;
+				if (nums.includes(weightVal)) {
+					weight.textContent = 0;
+					return;
+				}
+				weight.textContent = parseInt(weight.textContent) - 5;
+			}
+
+			function decreaseWeightBy16(e) {
+				// -16 button
+				e.preventDefault();
+				const weight = document.querySelector('.oz');
+				const weightVal = weight.textContent;
+				const nums = [
+					'1',
+					'2',
+					'3',
+					'4',
+					'5',
+					'6',
+					'7',
+					'8',
+					'9',
+					'10',
+					'11',
+					'12',
+					'13',
+					'14',
+					'15',
+				];
+				if (weightVal == '0') return;
+				if (nums.includes(weightVal)) {
+					weight.textContent = 0;
+					return;
+				}
+				weight.textContent = parseInt(weight.textContent) - 16;
+			}
+
+			// Event Listeners
+
+			const increaseBy1Button = document.querySelector('.increase1');
+			const increaseBy5Button = document.querySelector('.increase5');
+			const increaseBy16Button = document.querySelector('.increase16');
+			const decreaseBy1Button = document.querySelector('.decrease1');
+			const decreaseBy5Button = document.querySelector('.decrease5');
+			const decreaseBy16Button = document.querySelector('.decrease16');
+			increaseBy1Button.addEventListener('click', increaseWeightBy1);
+			increaseBy5Button.addEventListener('click', increaseWeightBy5);
+			increaseBy16Button.addEventListener('click', increaseWeightBy16);
+			decreaseBy1Button.addEventListener('click', decreaseWeightBy1);
+			decreaseBy5Button.addEventListener('click', decreaseWeightBy5);
+			decreaseBy16Button.addEventListener('click', decreaseWeightBy16);
+
+			const productDropdown = document.querySelector('#productTitle');
+			productDropdown.addEventListener('change', displayOrder);
+
+			const packageRadioButtons = document.querySelectorAll('.packageRadio');
+			packageRadioButtons.forEach((button) => {
+				button.addEventListener('change', enableBoxInput);
+			});
+
+			// On page load
+
+			displayProducts(orders);
+			displayFirstOrderOnLoad();
+
+			// on submit
+
+			// @result {Process} → all of the data submitted to the checklist is parsed into information then passed to a server side function
+			function checklistSubmission() {
+				const index = document.querySelector('#productTitle').value;
+				const order = orders[index];
+
+				const fragile = document.querySelector('input[name="fragile"]:checked');
+				let packageMap = document.querySelector(
+					'input[name="packaging"]:checked'
+				);
+				const weight = document.querySelector('.oz').textContent;
+
+				if (valsMissing(fragile, packageMap, weight)) return;
+
+				const skuNeedsStored = createSku(order, weight, packageMap, fragile);
+
+				// case handling
+				// const caseVal = document.querySelector('#case').value;
+				// if (caseVal !== '--') handleCase(caseVal);
+
+				google.script.run
+					.withSuccessHandler((response) => {
+						console.log(`Success: ${response}`);
+					})
+					.withFailureHandler((response) => {
+						console.log(`Failure: ${response}`);
+					})
+					.midgard(order, skuNeedsStored);
+				google.script.host.close();
+			}
+
+			// @result {Data} → a `secondWeight` property is initialized for the selected `order` object
+			function addWeight() {
+				const weight = document.querySelector('.oz');
+				const weightVal = weight.textContent;
+				weight.textContent = 0;
+				const index = document.querySelector('#productTitle').value;
+				const secondWeight = document.querySelector('#secondWeight');
+				secondWeight.textContent = `Additional weight: ${weightVal} oz`;
+				secondWeight.style.display = 'block';
+				orders[index].secondWeight = +weightVal;
+			}
+
+			// @param {Element:checked} fragile → the fragile radio button that is checked
+			// @param {Element:checked} packageMap → the packaging radio button that is checked
+			// @param {String} weight → the current textContent of the `weight element`
+			// @return {Boolean} → returns true if any of the values are missing
+			function valsMissing(fragile, packageMap, weight) {
+				const warnings = [];
+				// const removeWarnings = [];
+				if (!fragile) warnings.push('fragile');
+				if (!packageMap) warnings.push('packageMap');
+				if (+weight === 0) warnings.push('weight');
+				if (warnings.length === 0) return false;
+				handleWarnings(warnings);
+				return true;
+			}
+
+			// @param {Array} warnings → an array of strings that correspond to the id of the warning element
+			// @result {UI} → the warning elements are displayed for every field missing an input
+			function handleWarnings(warnings) {
+				for (const type of warnings) {
+					const warning = document.querySelector(`#${type}Warning`);
+					warning.style.display = 'block';
+				}
+			}
+
+			function generateBarcode() {
+				const index = document.querySelector('#productTitle').value;
+				const order = orders[index];
+				const secret = order.secret.slice(1);
+				const row = order.row;
+
+				let shipments = 1;
+				if (order.secondWeight) shipments = 2;
+
+				const targetContent = document.querySelector('#targetContent');
+				targetContent.style.width = '384px';
+
+				const barcode = document.createElement('img');
+				barcode.id = 'barcode';
+				barcode.src = `https:\/\/barcodeapi.org\/api\/128\/%23${secret}%3e${row}%3e${shipments}`;
+
+				targetContent.appendChild(barcode);
+
+				const button = document.querySelector('#barcodeBtn');
+				button.innerText = 'Print';
+				button.style.width = '10rem';
+				button.onclick = printContents;
+
+				barcode.scrollIntoView({
+					behavior: 'smooth',
+					block: 'center',
+					inline: 'nearest',
+				});
+			}
+
+			function printContents() {
+				const coverContent = document.querySelector('#coverContent');
+				const targetContent = document.querySelector('#targetContent');
+				targetContent.style.zIndex = '2';
+				coverContent.style.zIndex = '1';
+				window.print(targetContent);
+				targetContent.style.zIndex = '0';
+				coverContent.style.zIndex = '-1';
+			}
+
+			// case handling
+
+			function handleCase(caseVal) {
+				switch (true) {
+					case caseVal === 'quantity':
+						quantity();
+						break;
+					case caseVal === 'damaged':
+						damaged();
+						break;
+					case caseVal === 'Not Found':
+						notFound();
+						break;
+					case caseVal === 'Instance !== received':
+						instanceNotReceived();
+						break;
+				}
+			}
+
+			function createSku(order, weight, packageMap, fragile) {
+				if (order.weight) return false;
+
+				if (packageMap.value === 'box')
+					order.packageMap = document.querySelector('#boxDropdown').value;
+				else order.packageMap = packageMap.value;
+
+				if (order.secondWeight)
+					order.weight = `${+weight}+${order.secondWeight}`;
+				else order.weight = +weight;
+				order.fragile = fragile.value;
+				order.sku = [
+					order.sku,
+					order.weight,
+					order.packageMap,
+					order.fragile,
+				].join('|');
+				return true;
+			}
+		</script>
+	</body>
+</html>
