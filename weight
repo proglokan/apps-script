@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<style>
+			@import url('https://fonts.googleapis.com/css2?family=Raleway:wght@200;300;400;500;600;700;800&display=swap');
+
+			:root {
+				--snow: #d1ded3;
+				--pastel-mint: #9cbfac;
+				--off-blue: #719d99;
+				--lake: #45767c;
+				--dark-blue: #29445d;
+				font-family: 'Raleway', sans-serif;
+			}
+
+			body {
+				margin: 0;
+				padding: 0;
+				width: 100%;
+				height: 100%;
+				display: flex;
+				flex-direction: column;
+				justify-content: center;
+				align-items: center;
+				gap: 1rem;
+				background-color: var(--dark-blue);
+			}
+
+			#valueContainer {
+				width: 100%;
+				height: 10rem;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+			}
+
+			#value {
+				width: 24rem;
+				height: 7rem;
+				border: 0.25rem solid var(--pastel-mint);
+				border-radius: 2rem;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				color: var(--pastel-mint);
+				background-color: var(--lake);
+				font-size: 5rem;
+				cursor: pointerk;
+			}
+
+			#buttonContainer {
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				gap: 3rem;
+			}
+
+			#buttonContainer > button {
+				width: 6rem;
+				height: 4rem;
+				color: aliceblue;
+				font-size: 2rem;
+				border: 0.25rem solid var(--pastel-mint);
+				background-color: var(--lake);
+				border-radius: 1rem;
+				color: var(--pastel-mint);
+				cursor: pointer;
+			}
+
+			#randomNumContainer {
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				gap: 2rem;
+				margin-top: 2rem;
+			}
+
+			#generateNum {
+				height: 4rem;
+				color: aliceblue;
+				font-size: 1.5rem;
+				border: 0.25rem solid var(--pastel-mint);
+				background-color: var(--lake);
+				border-radius: 1rem;
+				color: var(--pastel-mint);
+				cursor: pointer;
+			}
+
+			#num {
+				width: 4rem;
+				height: 3rem;
+				border-right: 0.5rem solid var(--pastel-mint);
+				background-color: var(--lake);
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				color: var(--pastel-mint);
+				font-size: 2rem;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div id="valueContainer">
+			<span id="value">0</span>
+		</div>
+		<div id="buttonContainer">
+			<button class="incDecBtns" id="one">1</button>
+			<button class="incDecBtns" id="five">5</button>
+			<button class="incDecBtns" id="ten">10</button>
+		</div>
+		<div id="randomNumContainer">
+			<button id="generateNum" onclick="generateRandomNum()">
+				Generate num
+			</button>
+			<span id="num"></span>
+		</div>
+		<script>
+			function addButtonListeners() {
+				const buttons = document.querySelectorAll('.incDecBtns');
+				buttons.forEach((button) => {
+					button.addEventListener('wheel', (ev) => {
+						ev.preventDefault();
+						const val = +ev.target.textContent;
+						const delta = ev.deltaY > 0 ? -val : val;
+						const currentValue = +value.textContent;
+						const newValue = currentValue + delta;
+						if (newValue >= 0) value.textContent = newValue;
+					});
+				});
+			}
+
+			addButtonListeners();
+		</script>
+	</body>
+</html>

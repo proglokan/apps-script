@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<style>
+			@import url('https://fonts.googleapis.com/css2?family=Raleway:wght@200;300;400;500;600;700;800&display=swap');
+
+			:root {
+				--snow: #d1ded3;
+				--pastel-mint: #9cbfac;
+				--off-blue: #719d99;
+				--lake: #45767c;
+				--dark-blue: #29445d;
+				font-family: 'Raleway', sans-serif;
+			}
+
+			body {
+				margin: 0;
+				padding: 0;
+				width: 100%;
+				height: 100%;
+				display: flex;
+				flex-direction: column;
+				justify-content: center;
+				align-items: center;
+				gap: 1rem;
+				background-color: var(--dark-blue);
+			}
+
+			#barcode {
+				transform: rotate(90deg);
+				width: 95%;
+				border: 0.25rem solid black;
+				border-radius: 1rem;
+				padding: 1rem 0 1rem 0;
+			}
+
+			button {
+				width: 10rem;
+				height: 5rem;
+				border: 0.25rem solid var(--pastel-mint);
+				border-radius: 2rem;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				color: var(--pastel-mint);
+				background-color: var(--lake);
+				font-size: 1.25rem;
+				margin-top: 2rem;
+				cursor: pointer;
+			}
+		</style>
+	</head>
+
+	<body>
+		<button onclick="generateAndPrintBarcode()">Open Barcode</button>
+		<script>
+			function generateAndPrintBarcode() {
+				// const index = document.querySelector('#productTitle').value;
+				// const order = orders[index];
+				// const secret = order.secret.slice(1);
+				// const row = order.row;
+				const title =
+					'Purina Friskies Gravy Wet Cat Food, Variety Pack, 5.5 Ounce (60 Count)';
+				const secret = 'f3f3f3';
+				const row = 123;
+
+				let shipments = 1;
+				// if (order.secondWeight) shipments = 2;
+
+				const barcodeUrl = `https:\/\/barcodeapi.org\/api\/128\/%23${secret}%3e${row}%3e${shipments}`;
+
+				const printWindow = window.open(
+					'',
+					'Print Window',
+					'height=1000,width=1000'
+				);
+
+				const printBody = printWindow.document.querySelector('body');
+				printBody.style.width = '100%';
+				printBody.style.height = '100vh';
+				printBody.style.display = 'flex';
+				printBody.style.flexDirection = 'column';
+				printBody.style.justifyContent = 'center';
+				printBody.style.alignItems = 'center';
+
+				const titleElement = printWindow.document.createElement('p');
+				titleElement.style.fontSize = '1.25rem';
+				titleElement.style.position = 'absolute';
+				titleElement.style.width = '100%';
+				titleElement.style.marginRight = '15rem';
+				titleElement.style.transform = 'rotate(90deg)';
+				titleElement.innerText = title;
+
+				const barcode = new Image();
+				barcode.src = barcodeUrl;
+				barcode.style.transform = 'rotate(90deg)';
+				barcode.style.border = '0.25rem solid black';
+				barcode.style.borderRadius = '1rem';
+				barcode.style.padding = '1rem 0 1rem 0';
+				barcode.onload = () => {
+					const targetContent = printWindow.document.createElement('div');
+					targetContent.style.width = '384px';
+					targetContent.style.aspect = '6/4';
+					targetContent.style.display = 'flex';
+					targetContent.style.justifyContent = 'center';
+					targetContent.style.alignItems = 'center';
+					targetContent.style.textAlign = 'center';
+					targetContent.appendChild(titleElement);
+					targetContent.appendChild(barcode);
+
+					printWindow.document.body.appendChild(targetContent);
+
+					printWindow.print();
+					printWindow.close();
+				};
+
+				barcode.onerror = () => {
+					console.error('Error loading barcode image');
+				};
+			}
+		</script>
+	</body>
+</html>
