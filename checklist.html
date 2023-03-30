@@ -777,6 +777,20 @@
 				packagingNodes.forEach((node) => (node.checked = false));
 			}
 
+			function displayWeight(order) {
+				const weight = document.querySelector('#weightValue');
+				const regex = /\+/i;
+				if (!regex.test(order.weight)) {
+					weight.textContent = order.weight;
+					return;
+				}
+				const [firstWeight, secondWeight] = order.weight.split('+');
+				weight.textContent = firstWeight;
+
+				const splitWeight = document.querySelector('#splitShipment');
+				splitWeight.textContent = `1 of 2 shipments: ${weightVal} oz`;
+			}
+
 			function enableBoxInput(e) {
 				// Enables and disables box dropdown
 				const boxDropdown = document.querySelector('#boxDropdown');
@@ -903,8 +917,6 @@
 				const barcode = new Image();
 				barcode.src = barcodeUrl;
 				barcode.style.transform = 'rotate(90deg)';
-				barcode.style.border = '0.25rem solid black';
-				barcode.style.borderRadius = '1rem';
 				barcode.style.padding = '1rem 0 1rem 0';
 				barcode.onload = () => {
 					const targetContent = printWindow.document.createElement('div');
@@ -926,46 +938,6 @@
 				barcode.onerror = () => {
 					console.error('Error loading barcode image');
 				};
-			}
-
-			function generateBarcode() {
-				const index = document.querySelector('#productTitle').value;
-				const order = orders[index];
-				const secret = order.secret.slice(1);
-				const row = order.row;
-
-				let shipments = 1;
-				if (order.splitWeight) shipments = 2;
-
-				const targetContent = document.querySelector('#targetContent');
-				targetContent.style.width = '384px';
-
-				const barcode = document.createElement('img');
-				barcode.id = 'barcode';
-				barcode.src = `https:\/\/barcodeapi.org\/api\/128\/%23${secret}%3e${row}%3e${shipments}`;
-
-				targetContent.appendChild(barcode);
-
-				const button = document.querySelector('#barcodeBtn');
-				button.innerText = 'Print';
-				button.style.width = '10rem';
-				button.onclick = printContents;
-
-				barcode.scrollIntoView({
-					behavior: 'smooth',
-					block: 'center',
-					inline: 'nearest',
-				});
-			}
-
-			function printContents() {
-				const coverContent = document.querySelector('#coverContent');
-				const targetContent = document.querySelector('#targetContent');
-				targetContent.style.zIndex = '2';
-				coverContent.style.zIndex = '1';
-				window.print(targetContent);
-				targetContent.style.zIndex = '0';
-				coverContent.style.zIndex = '-1';
 			}
 
 			function clearChecklist() {
