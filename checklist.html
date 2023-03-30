@@ -188,16 +188,6 @@
 				transform: rotate(45deg);
 			}
 
-			#coverContent {
-				position: absolute;
-				top: 0;
-				left: 0;
-				width: 100%;
-				height: 100%;
-				background-color: #fff;
-				z-index: -1;
-			}
-
 			#form {
 				display: flex;
 				flex-direction: column;
@@ -211,6 +201,7 @@
 			}
 
 			#orderStatus {
+				visibility: hidden;
 				display: flex;
 				justify-content: center;
 				align-items: center;
@@ -442,7 +433,6 @@
 	</head>
 
 	<body>
-		<div id="coverContent"></div>
 		<span id="scroll" onclick="scrollDown()">
 			<span id="leftHalfOfArrow"></span>
 			<span id="rightHalfOfArrow"></span>
@@ -789,7 +779,7 @@
 				weight.textContent = firstWeight;
 
 				const splitWeight = document.querySelector('#splitShipment');
-				splitWeight.textContent = `1 of 2 shipments: ${weightVal} oz`;
+				splitWeight.textContent = `1 of 2 shipments: ${secondWeight} oz`;
 			}
 
 			function enableBoxInput(e) {

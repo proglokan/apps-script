@@ -80,7 +80,7 @@ function checkRowIndexColumn() {
 
 	const template = HtmlService.createTemplateFromFile('row-check');
 	template.statuses = statuses;
-	const html = template.evaluate().setWidth(1000).setHeight(700);
+	const html = template.evaluate().setWidth(1200).setHeight(800);
 	const ui = SpreadsheetApp.getUi();
 	ui.showModelessDialog(html, `Row #${colPosition} statuses`);
 }

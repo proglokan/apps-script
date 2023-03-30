@@ -53,7 +53,7 @@ function checkRowIndexColumn() {
 		ordered: [],
 		mixed: [],
 	};
-  let colPosition;
+	let colPosition;
 	for (const workbook of extWorkbooks) {
 		const name = workbook[0];
 		const id = workbook[1];
@@ -62,7 +62,7 @@ function checkRowIndexColumn() {
 		const headersRange = sheet.getRange(1, 1, 1, sheet.getLastColumn());
 		const headers = headersRange.getValues()[0];
 		const col = headers.indexOf('Row') + 1;
-    colPosition = col;
+		colPosition = col;
 		const rowIndexRange = sheet.getRange(1, col, sheet.getLastRow());
 		const rowIndexes = rowIndexRange
 			.getValues()
@@ -96,7 +96,7 @@ function pullData() {
 		rows: null,
 		supplierValues: 'N3:O',
 		orderValues: 'AP3:AR',
-    rowValues: 'AV3:AV'
+		rowValues: 'AV3:AV',
 	};
 
 	for (const sheet of extWorkbooks) {
@@ -111,10 +111,12 @@ function pullData() {
 			.getRange(ranges.supplierValues)
 			.getValues();
 		const orderValues = currSheet.getRange(ranges.orderValues).getValues();
-    const rowValues = currSheet.getRange(ranges.rowValues).getValues();
+		const rowValues = currSheet.getRange(ranges.rowValues).getValues();
 		const concatenatedValues = [];
 		for (let n = 0; n < ranges.rows; n++) {
-			concatenatedValues[n] = supplierValues[n].concat(orderValues[n].concat(rowValues[n]));
+			concatenatedValues[n] = supplierValues[n].concat(
+				orderValues[n].concat(rowValues[n])
+			);
 		}
 
 		const lastRow = dataSheet.getLastRow() + 1;
@@ -241,14 +243,14 @@ function getFee(weight, packageMap) {
 	const fee = {
 		processing: null,
 		packaging: null,
-    shipping: null
+		shipping: null,
 	};
 
-  fee.shipping = 6;
+	fee.shipping = 6;
 
-  const shippingWeight = Math.round(weight/16);
-  
-  if (shippingWeight > 8) fee.shipping = 10.5;
+	const shippingWeight = Math.round(weight / 16);
+
+	if (shippingWeight > 8) fee.shipping = 10.5;
 
 	switch (true) {
 		case weight <= 80:
@@ -309,7 +311,7 @@ function initFinalVals(order) {
 		weight: weight,
 		processingFee: order.fee.processing,
 		packagingFee: order.fee.packaging,
-    shippingFee: order.fee.shipping,
+		shippingFee: order.fee.shipping,
 		date: date,
 		time: time,
 		status: status,
@@ -333,7 +335,7 @@ function storeOrder(finalizedOrder) {
 		'#f6f6f6': 10,
 		'#f5f5f5': 11,
 		'#f4f4f4': 12,
-    '#f3f3f3': 13
+		'#f3f3f3': 13,
 	};
 	const {
 		secret,
@@ -341,7 +343,7 @@ function storeOrder(finalizedOrder) {
 		weight,
 		processingFee,
 		packagingFee,
-    shippingFee,
+		shippingFee,
 		date,
 		time,
 		status,
@@ -353,8 +355,10 @@ function storeOrder(finalizedOrder) {
 		1;
 	const range = processedSheet.getRange(lastRowInCol, column);
 	range.setValue(joinOrder);
-  SpreadsheetApp.getActive().toast(`Stored at row: ${lastRowInCol} col: ${column}`);
-  regionalControlCenter9();
+	SpreadsheetApp.getActive().toast(
+		`Stored at row: ${lastRowInCol} col: ${column}`
+	);
+	regionalControlCenter9();
 }
 
 // @result {Process} → handle data after warehouse is finished, returns information to every applicable workbook
@@ -414,21 +418,29 @@ function allocateOrders(orderMatrix) {
 			const sheet = SpreadsheetApp.openById(id).getSheetByName('Mar 2023');
 			vals.forEach((val) => {
 				const orderInfo = val[0].split('>');
-				let [row, weight1, processingFee, packagingFee, shippingFee, date, time, status] =
-					orderInfo;
+				let [
+					row,
+					weight1,
+					processingFee,
+					packagingFee,
+					shippingFee,
+					date,
+					time,
+					status,
+				] = orderInfo;
 				let weight2 = null;
 				if (isNaN(+weight1)) {
 					[weight1, weight2] = weight1.split('+');
-					weight2 = Math.round(+weight2/16);
+					weight2 = Math.round(+weight2 / 16);
 				}
-        weight1 = Math.round(+weight1/16);
+				weight1 = Math.round(+weight1 / 16);
 				const orderKVP = {
 					row,
 					weight1,
 					weight2,
 					// processingFee,
 					// packagingFee,
-          // shippingFee,
+					// shippingFee,
 					date,
 					time,
 					status,
