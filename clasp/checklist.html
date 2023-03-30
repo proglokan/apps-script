@@ -157,14 +157,35 @@
 				background-color: var(--white-color);
 			}
 
-			#coverContent {
+			#scroll {
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				position: fixed;
+				bottom: 2rem;
+				right: 3.25rem;
+				width: 3rem;
+				height: 3rem;
+				cursor: pointer;
+				border-radius: 3rem;
+			}
+
+			#leftHalfOfArrow,
+			#rightHalfOfArrow {
 				position: absolute;
-				top: 0;
-				left: 0;
-				width: 100%;
-				height: 100%;
-				background-color: #fff;
-				z-index: -1;
+				width: 0.375rem;
+				height: 1.25rem;
+				background-color: var(--pine-color);
+			}
+
+			#leftHalfOfArrow {
+				left: 1rem;
+				transform: rotate(-45deg);
+			}
+
+			#rightHalfOfArrow {
+				right: 1rem;
+				transform: rotate(45deg);
 			}
 
 			#form {
@@ -177,6 +198,17 @@
 
 			#form > * {
 				width: 80%;
+			}
+
+			#orderStatus {
+				visibility: hidden;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				width: 90%;
+				height: 2rem;
+				background-color: var(--red-color);
+				color: var(--cream-color);
 			}
 
 			.productTitle,
@@ -208,7 +240,7 @@
 			}
 
 			.productOrderID {
-				border-bottom: 3px solid var(--cream-color);
+				border-bottom: 0.2rem solid var(--cream-color);
 				padding-bottom: 2rem;
 			}
 
@@ -216,7 +248,6 @@
 			.productQuantity > p:first-of-type,
 			.fragile > p,
 			.packagingSection > p,
-			.weight > p,
 			.case > p {
 				font-size: 1.2rem;
 				font-weight: 600;
@@ -226,7 +257,6 @@
 			.productQuantity,
 			.fragile,
 			.packagingSection,
-			.weight,
 			.case {
 				display: flex;
 				flex-direction: column;
@@ -236,8 +266,7 @@
 
 			.fragile label,
 			.quantity,
-			.packagingSection label,
-			.weight div {
+			.packagingSection label {
 				color: var(--green-color);
 				font-weight: 600;
 			}
@@ -262,45 +291,61 @@
 				outline: none;
 			}
 
-			.weight > div {
+			section {
 				display: flex;
+				flex-direction: column;
+				align-items: center;
+			}
+
+			#weight {
+				gap: 2rem;
+			}
+
+			#weightValContainer {
+				height: 2rem;
+				display: flex;
+				justify-content: center;
 				align-items: center;
 				gap: 1rem;
 			}
 
-			.weight .buttons {
-				display: grid;
-				grid-template-columns: 1fr 1fr 1fr;
-				gap: 0.5rem;
-			}
-
-			#addWeightOuter {
-				width: 1.375rem;
-				height: 1.375rem;
-				border: 0.2rem solid var(--green-color);
-				border-radius: 2rem;
+			#weightValue,
+			#ozSpan {
 				display: flex;
-				flex-direction: column;
-				align-items: center;
 				justify-content: center;
+				align-items: center;
+				color: var(--blue-color);
+				font-size: 2.5rem;
 				cursor: pointer;
 			}
 
-			#addWeightInner {
-				color: var(--green-color);
-				font-size: 2rem;
-				font-weight: 400;
+			#weightButtonContainer {
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				gap: 2rem;
 			}
 
-			#secondWeight {
-				display: none;
-				padding: 0.125rem 0 0.125rem 0;
+			.incDecBtns {
+				width: 6rem;
+				height: 4rem;
+				font-size: 1.5rem;
+				border: 0.25rem solid var(--orange-color);
+				background-color: var(--cream-color);
+				border-radius: 1rem;
+				color: var(--red-color);
+				cursor: pointer;
+			}
+
+			#splitWeight {
+				padding: 1rem 0 1rem 0;
 				text-align: center;
 				border-left: 0.25rem solid var(--orange-color);
-				width: 75%;
+				width: 25%;
 				font-style: italic;
 				color: var(--green-color);
 				background-color: var(--cream-color);
+				cursor: pointer;
 			}
 
 			.warning {
@@ -316,16 +361,6 @@
 				background-color: rgba(193, 74, 74, 0.486);
 			}
 
-			.buttons button {
-				background-color: var(--cream-color);
-				color: var(--green-color);
-				border-radius: 5px;
-				border: 3px solid var(--orange-color);
-				width: 4rem;
-				height: 2rem;
-				font-weight: 600;
-			}
-
 			#case {
 				width: 20rem;
 				height: 2rem;
@@ -339,18 +374,18 @@
 				text-align: center;
 			}
 
-			#form > button {
-				width: 12rem;
+			.button {
+				min-width: 9rem;
 				height: 3rem;
-				font-size: 1.2rem;
+				font-size: 1rem;
 				color: var(--red-color);
 				font-weight: bold;
-				border-radius: 7px;
+				border-radius: 0.75rem;
 				border: 3px solid var(--orange-color);
 				background-color: var(--cream-color);
 			}
 
-			select:enabled,
+			#form select:enabled,
 			input,
 			label,
 			button {
@@ -378,20 +413,11 @@
 				outline: unset !important;
 			}
 
-			#targetContent {
-				width: 0;
-				aspect-ratio: 4/6;
+			#bottomButtonGroup {
 				display: flex;
 				align-items: center;
 				justify-content: center;
-			}
-
-			#barcode {
-				/* transform: rotate(90deg); */
-        width: 95%;
-				border: 0.25rem solid black;
-				border-radius: 1rem;
-				padding: 1rem 0 1rem 0;
+				gap: 1rem;
 			}
 
 			::-webkit-scrollbar {
@@ -407,8 +433,14 @@
 	</head>
 
 	<body>
-		<div id="coverContent"></div>
+		<span id="scroll" onclick="scrollDown()">
+			<span id="leftHalfOfArrow"></span>
+			<span id="rightHalfOfArrow"></span>
+		</span>
 		<div id="form">
+			<div id="orderStatus" onclick="handleStopShipment()">
+				Handle Stop Shipment (❁´◡`❁)
+			</div>
 			<div class="productTitle">
 				<p>Product Title:</p>
 				<select name="productTitle" id="productTitle"></select>
@@ -575,31 +607,29 @@
 					>Package map cannot be blank</small
 				>
 			</div>
-
-			<div class="weight">
-				<p>Weight:</p>
-				<div>
-					<p><span class="oz">0</span> oz</p>
-					<div class="buttons">
-						<button class="increase1">+1 oz</button>
-						<button class="increase5">+5 oz</button>
-						<button class="increase16">+16 oz</button>
-						<button class="decrease1">-1 oz</button>
-						<button class="decrease5">-5 oz</button>
-						<button class="decrease16">-16 oz</button>
-					</div>
-					<span id="addWeightOuter" onclick="addWeight()">
-						<span id="addWeightInner">+</span>
-					</span>
+			<section id="weight">
+				<div id="weightValContainer">
+					<span id="weightValue">0</span>
+					<span id="ozSpan">oz</span>
 				</div>
-				<small id="secondWeight"></small>
+				<div id="weightButtonContainer">
+					<button class="incDecBtns">1</button>
+					<button class="incDecBtns">5</button>
+					<button class="incDecBtns">10</button>
+				</div>
+				<small id="splitWeight" onclick="addWeight()">✓ Split shipment</small>
 				<small class="warning" id="weightWarning">Weight cannot be `0`</small>
-			</div>
-
-			<div id="targetContent"></div>
-			<button onclick="generateBarcode()" id="barcodeBtn">
-				Generate Barcode
-			</button>
+			</section>
+			<section id="print">
+				<div id="targetContent"></div>
+				<button
+					class="button"
+					onclick="generateAndPrintBarcode()"
+					id="barcodeBtn"
+				>
+					Generate Barcode
+				</button>
+			</section>
 
 			<div class="case">
 				<p>(In development) Case:</p>
@@ -612,7 +642,11 @@
 				</select>
 			</div>
 
-			<button onclick="checklistSubmission()">Submit</button>
+			<div id="bottomButtonGroup">
+				<button class="button" onclick="clearChecklist()">Clear</button>
+				<button class="button" onclick="checklistSubmission()">Submit</button>
+				<button class="button" onclick="requestNextQuery()">Next Query</button>
+			</div>
 		</div>
 
 		<script>
@@ -623,9 +657,25 @@
 					this.order = order;
 				}
 			}
-
 			const orders = JSON.parse(<?= JSON.stringify(orders) ?>);
 			// All that good logic
+
+			function addButtonListeners() {
+				const value = document.querySelector('#weightValue');
+				const buttons = document.querySelectorAll('.incDecBtns');
+				buttons.forEach((button) => {
+					button.addEventListener('wheel', (ev) => {
+						ev.preventDefault();
+						const val = +ev.target.textContent;
+						const delta = ev.deltaY > 0 ? -val : val;
+						const currentValue = +value.textContent;
+						const newValue = currentValue + delta;
+						if (newValue >= 0) value.textContent = newValue;
+					});
+				});
+			}
+
+			addButtonListeners();
 
 			function displayProducts(arr) {
 				// displays all products in product title dropdown
@@ -689,212 +739,55 @@
 
 			function displayPackaging(order) {
 				// Checks one of the packaging input checkboxes
-				const asIsInput = document.querySelector('#asis');
-				const tripleZeroInput = document.querySelector('#tripleZero');
-				const threeInput = document.querySelector('#three');
-				const bb3Input = document.querySelector('#bb3');
-				const fiveInput = document.querySelector('#five');
-				const bb5Input = document.querySelector('#bb5');
-				const sevenInput = document.querySelector('#seven');
-				const bb7Input = document.querySelector('#bb7');
-				const bb9Input = document.querySelector('#bb9');
-				const bb24Input = document.querySelector('#bb24');
-				const boxInput = document.querySelector('#box');
+				const packagingNodes = document.querySelectorAll('[name="packaging"]');
 				const boxDropdown = document.querySelector('#boxDropdown');
-				document
-					.querySelector('#boxDropdown')
-					.getElementsByTagName('option')[0].selected = true;
-				const val = order.packageMap;
-				switch (true) {
-					case val === 'asis':
-						asIsInput.checked = true;
+
+				for (let x = 0; x < packagingNodes.length; ++x) {
+					if (packagingNodes[x].value === order.packageMap) {
+						packagingNodes[x].checked = true;
+						boxDropdown.value = '--';
 						boxDropdown.disabled = true;
-						break;
-					case val === '000':
-						tripleZeroInput.checked = true;
-						boxDropdown.disabled = true;
-						break;
-					case val === '3':
-						threeInput.checked = true;
-						boxDropdown.disabled = true;
-						break;
-					case val === 'BB3':
-						bb3Input.checked = true;
-						boxDropdown.disabled = true;
-						break;
-					case val === '5':
-						fiveInput.checked = true;
-						boxDropdown.disabled = true;
-						break;
-					case val === 'BB5':
-						bb5Input.checked = true;
-						boxDropdown.disabled = true;
-						break;
-					case val === '7':
-						sevenInput.checked = true;
-						boxDropdown.disabled = true;
-						break;
-					case val === 'BB7':
-						bb7Input.checked = true;
-						boxDropdown.disabled = true;
-						break;
-					case val === 'BB9':
-						bb9Input.checked = true;
-						boxDropdown.disabled = true;
-						break;
-					case val === 'BB24':
-						bb24Input.checked = true;
-						boxDropdown.disabled = true;
-						break;
-					case val !== null && val.indexOf('x') !== -1:
-						boxInput.checked = true;
-						boxDropdown.disabled = false;
-						displayBoxPackaging(order);
-						break;
-					default:
-            asIsInput.checked = false;
-						tripleZeroInput.checked = false;
-						bb9Input.checked = false;
-						threeInput.checked = false;
-						bb3Input.checked = false;
-						fiveInput.checked = false;
-						bb5Input.checked = false;
-						sevenInput.checked = false;
-						bb7Input.checked = false;
-            bb24Input.checked = false;
-						boxInput.checked = false;
-						boxDropdown.disabled = true;
+						return;
+					}
 				}
+
+				const regex = new RegExp(order.packageMap, 'i');
+				const boxTest = Array.from(boxDropdown.options).some((node) =>
+					regex.test(node.value)
+				);
+
+				if (boxTest && order.packageMap !== null) {
+					document.querySelector('#box').checked = true;
+					boxDropdown.value = order.packageMap;
+					return;
+				}
+
+				boxDropdown.value = '--';
+				boxDropdown.disabled = true;
+				packagingNodes.forEach((node) => (node.checked = false));
 			}
 
-			function displayBoxPackaging(order) {
-				const dropdownVals = {
-					'--': 0,
-					'7x7x7': 1,
-					'10x10x10': 2,
-					'12x8x8': 3,
-					'12x12x12': 4,
-					'18x12x8': 5,
-					'18x18x16': 6,
-					'18x18x24': 7,
-					'24x24x24': 8,
-				};
-				const optionIndex = dropdownVals[order.packageMap];
-				const option = document
-					.querySelector('#boxDropdown')
-					.getElementsByTagName('option')[optionIndex];
-				option.selected = true;
+			function displayWeight(order) {
+				if (!order.weight) return;
+				const weight = document.querySelector('#weightValue');
+				const regex = /\+/i;
+				if (!regex.test(order.weight)) {
+					weight.textContent = order.weight;
+					return;
+				}
+				const [firstWeight, secondWeight] = order.weight.split('+');
+				weight.textContent = firstWeight;
+
+				const splitWeight = document.querySelector('#splitShipment');
+				splitWeight.textContent = `1 of 2 shipments: ${secondWeight} oz`;
 			}
 
 			function enableBoxInput(e) {
 				// Enables and disables box dropdown
 				const boxDropdown = document.querySelector('#boxDropdown');
-				if (e.target.value === 'box') {
-					boxDropdown.disabled = false;
-				} else {
-					boxDropdown.disabled = true;
-				}
+				if (e.target.value === 'box') boxDropdown.disabled = false;
+				else boxDropdown.disabled = true;
 			}
-
-			function displayWeight(order) {
-				// Displays package weight on page
-				const weight = document.querySelector('.oz');
-				if (!order.weight) {
-					weight.textContent = '0';
-					return;
-				} else {
-					const correctWeight = order.weight.split(' ')[0];
-					weight.textContent = correctWeight;
-				}
-			}
-
-			function increaseWeightBy1(e) {
-				// +1 button
-				e.preventDefault();
-				const weight = document.querySelector('.oz');
-				weight.textContent = parseInt(weight.textContent) + 1;
-			}
-
-			function increaseWeightBy5(e) {
-				// +5 button
-				e.preventDefault();
-				const weight = document.querySelector('.oz');
-				weight.textContent = parseInt(weight.textContent) + 5;
-			}
-
-			function increaseWeightBy16(e) {
-				// +16 button
-				e.preventDefault();
-				const weight = document.querySelector('.oz');
-				weight.textContent = parseInt(weight.textContent) + 16;
-			}
-
-			function decreaseWeightBy1(e) {
-				// -1 button
-				e.preventDefault();
-				const weight = document.querySelector('.oz');
-				if (weight.textContent === '0') return;
-				weight.textContent = parseInt(weight.textContent) - 1;
-			}
-
-			function decreaseWeightBy5(e) {
-				// -5 button
-				e.preventDefault();
-				const weight = document.querySelector('.oz');
-				const weightVal = weight.textContent;
-				const nums = ['1', '2', '3', '4'];
-				if (weightVal == '0') return;
-				if (nums.includes(weightVal)) {
-					weight.textContent = 0;
-					return;
-				}
-				weight.textContent = parseInt(weight.textContent) - 5;
-			}
-
-			function decreaseWeightBy16(e) {
-				// -16 button
-				e.preventDefault();
-				const weight = document.querySelector('.oz');
-				const weightVal = weight.textContent;
-				const nums = [
-					'1',
-					'2',
-					'3',
-					'4',
-					'5',
-					'6',
-					'7',
-					'8',
-					'9',
-					'10',
-					'11',
-					'12',
-					'13',
-					'14',
-					'15',
-				];
-				if (weightVal == '0') return;
-				if (nums.includes(weightVal)) {
-					weight.textContent = 0;
-					return;
-				}
-				weight.textContent = parseInt(weight.textContent) - 16;
-			}
-
-			// Event Listeners
-
-			const increaseBy1Button = document.querySelector('.increase1');
-			const increaseBy5Button = document.querySelector('.increase5');
-			const increaseBy16Button = document.querySelector('.increase16');
-			const decreaseBy1Button = document.querySelector('.decrease1');
-			const decreaseBy5Button = document.querySelector('.decrease5');
-			const decreaseBy16Button = document.querySelector('.decrease16');
-			increaseBy1Button.addEventListener('click', increaseWeightBy1);
-			increaseBy5Button.addEventListener('click', increaseWeightBy5);
-			increaseBy16Button.addEventListener('click', increaseWeightBy16);
-			decreaseBy1Button.addEventListener('click', decreaseWeightBy1);
-			decreaseBy5Button.addEventListener('click', decreaseWeightBy5);
-			decreaseBy16Button.addEventListener('click', decreaseWeightBy16);
 
 			const productDropdown = document.querySelector('#productTitle');
 			productDropdown.addEventListener('change', displayOrder);
@@ -920,7 +813,7 @@
 				let packageMap = document.querySelector(
 					'input[name="packaging"]:checked'
 				);
-				const weight = document.querySelector('.oz').textContent;
+				const weight = document.querySelector('#weightValue').textContent;
 
 				if (valsMissing(fragile, packageMap, weight)) return;
 
@@ -941,16 +834,17 @@
 				google.script.host.close();
 			}
 
-			// @result {Data} → a `secondWeight` property is initialized for the selected `order` object
+			// @result {Data} → a `splitWeight` property is initialized for the selected `order` object
 			function addWeight() {
-				const weight = document.querySelector('.oz');
+				const weight = document.querySelector('#weightValue');
 				const weightVal = weight.textContent;
+				if (valsMissing(null, null, weightVal)) return;
 				weight.textContent = 0;
 				const index = document.querySelector('#productTitle').value;
-				const secondWeight = document.querySelector('#secondWeight');
-				secondWeight.textContent = `Additional weight: ${weightVal} oz`;
-				secondWeight.style.display = 'block';
-				orders[index].secondWeight = +weightVal;
+				const splitWeight = document.querySelector('#splitWeight');
+				splitWeight.textContent = `1 of 2 shipments: ${weightVal} oz`;
+				splitWeight.style.display = 'block';
+				orders[index].splitWeight = +weightVal;
 			}
 
 			// @param {Element:checked} fragile → the fragile radio button that is checked
@@ -960,8 +854,8 @@
 			function valsMissing(fragile, packageMap, weight) {
 				const warnings = [];
 				// const removeWarnings = [];
-				if (!fragile) warnings.push('fragile');
-				if (!packageMap) warnings.push('packageMap');
+				if (!fragile && fragile !== null) warnings.push('fragile');
+				if (!packageMap & (packageMap !== null)) warnings.push('packageMap');
 				if (+weight === 0) warnings.push('weight');
 				if (warnings.length === 0) return false;
 				handleWarnings(warnings);
@@ -977,44 +871,90 @@
 				}
 			}
 
-			function generateBarcode() {
+			function generateAndPrintBarcode() {
 				const index = document.querySelector('#productTitle').value;
 				const order = orders[index];
 				const secret = order.secret.slice(1);
 				const row = order.row;
+				const title = order.productName;
 
 				let shipments = 1;
 				if (order.secondWeight) shipments = 2;
 
-				const targetContent = document.querySelector('#targetContent');
-				targetContent.style.width = '384px';
+				const barcodeUrl = `https:\/\/barcodeapi.org\/api\/128\/%23${secret}%3e${row}%3e${shipments}`;
 
-				const barcode = document.createElement('img');
-				barcode.id = 'barcode';
-				barcode.src = `https:\/\/barcodeapi.org\/api\/128\/%23${secret}%3e${row}%3e${shipments}`;
+				const printWindow = window.open(
+					'',
+					'Print Window',
+					'height=1000,width=1000'
+				);
 
-				targetContent.appendChild(barcode);
+				const printBody = printWindow.document.querySelector('body');
+				printBody.style.width = '100%';
+				printBody.style.height = '100vh';
+				printBody.style.display = 'flex';
+				printBody.style.flexDirection = 'column';
+				printBody.style.justifyContent = 'center';
+				printBody.style.alignItems = 'center';
 
-				const button = document.querySelector('#barcodeBtn');
-				button.innerText = 'Print';
-				button.style.width = '10rem';
-				button.onclick = printContents;
+				const titleElement = printWindow.document.createElement('p');
+				titleElement.style.fontSize = '1.25rem';
+				titleElement.style.position = 'absolute';
+				titleElement.style.width = '100%';
+				titleElement.style.marginRight = '15rem';
+				titleElement.style.transform = 'rotate(90deg)';
+				titleElement.innerText = title;
 
-				barcode.scrollIntoView({
+				const barcode = new Image();
+				barcode.src = barcodeUrl;
+				barcode.style.transform = 'rotate(90deg)';
+				barcode.style.padding = '1rem 0 1rem 0';
+				barcode.onload = () => {
+					const targetContent = printWindow.document.createElement('div');
+					targetContent.style.width = '384px';
+					targetContent.style.aspect = '6/4';
+					targetContent.style.display = 'flex';
+					targetContent.style.justifyContent = 'center';
+					targetContent.style.alignItems = 'center';
+					targetContent.style.textAlign = 'center';
+					targetContent.appendChild(titleElement);
+					targetContent.appendChild(barcode);
+
+					printWindow.document.body.appendChild(targetContent);
+
+					printWindow.print();
+					printWindow.close();
+				};
+
+				barcode.onerror = () => {
+					console.error('Error loading barcode image');
+				};
+			}
+
+			function clearChecklist() {
+				const fragileNodes = document.querySelectorAll('[name="fragile"]');
+				fragileNodes.forEach((node) => (node.checked = false));
+				const packagingNodes = document.querySelectorAll('[name="packaging"]');
+				packagingNodes.forEach((node) => (node.checked = false));
+
+				const boxDropdown = document.querySelector('#boxDropdown');
+				boxDropdown.disabled = true;
+				boxDropdown.value = '--';
+
+				const weight = document.querySelector('#weightValue');
+				weight.textContent = 0;
+
+				const splitWeight = document.querySelector('#splitWeight');
+				splitWeight.textContent = '+ Split shipment';
+			}
+
+			function scrollDown() {
+				const bottomButtonGroup = document.querySelector('#bottomButtonGroup');
+				bottomButtonGroup.scrollIntoView({
 					behavior: 'smooth',
 					block: 'center',
 					inline: 'nearest',
 				});
-			}
-
-			function printContents() {
-				const coverContent = document.querySelector('#coverContent');
-				const targetContent = document.querySelector('#targetContent');
-				targetContent.style.zIndex = '2';
-				coverContent.style.zIndex = '1';
-				window.print(targetContent);
-				targetContent.style.zIndex = '0';
-				coverContent.style.zIndex = '-1';
 			}
 
 			// case handling
@@ -1043,8 +983,7 @@
 					order.packageMap = document.querySelector('#boxDropdown').value;
 				else order.packageMap = packageMap.value;
 
-				if (order.secondWeight)
-					order.weight = `${+weight}+${order.secondWeight}`;
+				if (order.splitWeight) order.weight = `${+weight}+${order.splitWeight}`;
 				else order.weight = +weight;
 				order.fragile = fragile.value;
 				order.sku = [
@@ -1054,6 +993,11 @@
 					order.fragile,
 				].join('|');
 				return true;
+			}
+
+			function requestNextQuery() {
+				google.script.run.nextQuery();
+				google.script.host.close();
 			}
 		</script>
 	</body>

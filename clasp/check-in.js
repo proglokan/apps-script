@@ -80,7 +80,7 @@ function checkRowIndexColumn() {
 
 	const template = HtmlService.createTemplateFromFile('row-check');
 	template.statuses = statuses;
-	const html = template.evaluate().setWidth(1000).setHeight(700);
+	const html = template.evaluate().setWidth(1200).setHeight(800);
 	const ui = SpreadsheetApp.getUi();
 	ui.showModelessDialog(html, `Row #${colPosition} statuses`);
 }
@@ -216,6 +216,11 @@ function displayChecklist(orders) {
 	ui.showModelessDialog(html, 'Order Checklist');
 }
 
+function nextQuery() {
+	querySheet.getRange(querySheet.getLastRow(), 1).setValue('');
+	regionalControlCenter9();
+}
+
 // @result {Process} → handle data after checklist is submitted
 function midgard(order, skuNeedsStored) {
 	if (skuNeedsStored) storeSku(order.sku);
@@ -302,7 +307,7 @@ function initFinalVals(order) {
 	const newDate = new Date();
 	const date = newDate.toLocaleDateString();
 	const time = newDate.toLocaleTimeString();
-	const status = 'WH Rcvd';
+	const status = 'WH Shipped';
 	let weight = order.weight;
 
 	const finalizedOrder = {
