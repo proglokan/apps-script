@@ -766,7 +766,7 @@
 					regex.test(node.value)
 				);
 
-				if (boxTest) {
+				if (boxTest && order.packageMap !== null) {
 					document.querySelector('#box').checked = true;
 					boxDropdown.value = order.packageMap;
 					return;
@@ -778,6 +778,7 @@
 			}
 
 			function displayWeight(order) {
+				if (!order.weight) return;
 				const weight = document.querySelector('#weightValue');
 				const regex = /\+/i;
 				if (!regex.test(order.weight)) {
