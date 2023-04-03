@@ -80,7 +80,7 @@ function checkRowIndexColumn() {
 
 	const template = HtmlService.createTemplateFromFile('row-check');
 	template.statuses = statuses;
-	const html = template.evaluate().setWidth(1200).setHeight(800);
+	const html = template.evaluate().setWidth(1000).setHeight(800);
 	const ui = SpreadsheetApp.getUi();
 	ui.showModelessDialog(html, `Row #${colPosition} statuses`);
 }
@@ -211,7 +211,7 @@ function createNewOrders(data, query) {
 function displayChecklist(orders) {
 	const template = HtmlService.createTemplateFromFile('checklist');
 	template.orders = orders;
-	const html = template.evaluate().setWidth(750).setHeight(1000);
+	const html = template.evaluate().setWidth(955).setHeight(1000);
 	const ui = SpreadsheetApp.getUi();
 	ui.showModelessDialog(html, 'Order Checklist');
 }
@@ -279,7 +279,7 @@ function getFee(weight, packageMap) {
 	}
 
 	const packingMaterials = {
-		env: '000 3 BB3 5 BB5 7 BB7 BB9 BB24 7x7x7 10x10x10 12x8x8 18x12x8 asis',
+		env: '000 3 BB3 5 BB5 7 BB7 BB9 BB24 7x7x7 10x10x10 12x12x12 12x8x8 18x12x8 asis',
 		box: {
 			'18x18x16': 2.75,
 			'18x18x24': 3.25,
@@ -307,7 +307,7 @@ function initFinalVals(order) {
 	const newDate = new Date();
 	const date = newDate.toLocaleDateString();
 	const time = newDate.toLocaleTimeString();
-	const status = 'WH Shipped';
+	const status = 'WH Rcvd';
 	let weight = order.weight;
 
 	const finalizedOrder = {
@@ -436,9 +436,9 @@ function allocateOrders(orderMatrix) {
 				let weight2 = null;
 				if (isNaN(+weight1)) {
 					[weight1, weight2] = weight1.split('+');
-					weight2 = Math.round(+weight2 / 16);
+					weight2 = Math.ceil(+weight2 / 16);
 				}
-				weight1 = Math.round(+weight1 / 16);
+				weight1 = Math.ceil(+weight1 / 16);
 				const orderKVP = {
 					row,
 					weight1,

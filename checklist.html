@@ -770,15 +770,15 @@
 			function displayWeight(order) {
 				if (!order.weight) return;
 				const weight = document.querySelector('#weightValue');
+				const splitWeight = document.querySelector('#splitWeight');
 				const regex = /\+/i;
 				if (!regex.test(order.weight)) {
 					weight.textContent = order.weight;
+					splitWeight.textContent = '✓ Split shipment';
 					return;
 				}
 				const [firstWeight, secondWeight] = order.weight.split('+');
 				weight.textContent = firstWeight;
-
-				const splitWeight = document.querySelector('#splitWeight');
 				splitWeight.textContent = `1 of 2 shipments: ${secondWeight} oz`;
 			}
 
@@ -879,7 +879,7 @@
 				const title = order.productName;
 
 				let shipments = 1;
-				if (order.secondWeight) shipments = 2;
+				if (order.splitWeight) shipments = 2;
 
 				const barcodeUrl = `https:\/\/barcodeapi.org\/api\/128\/%23${secret}%3e${row}%3e${shipments}`;
 
@@ -908,7 +908,7 @@
 				const barcode = new Image();
 				barcode.src = barcodeUrl;
 				barcode.style.transform = 'rotate(90deg)';
-				barcode.style.padding = '1rem 0 1rem 0';
+				barcode.style.padding = '1rem 1rem 1rem 1rem';
 				barcode.onload = () => {
 					const targetContent = printWindow.document.createElement('div');
 					targetContent.style.width = '384px';
@@ -945,7 +945,7 @@
 				weight.textContent = 0;
 
 				const splitWeight = document.querySelector('#splitWeight');
-				splitWeight.textContent = '+ Split shipment';
+				splitWeight.textContent = '✓ Split shipment';
 			}
 
 			function scrollDown() {
