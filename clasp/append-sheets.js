@@ -119,9 +119,9 @@ function appendSheets() {
 	changeMap.set('Shipping Fee', 'c');
 
 	for (const id of extWorkbooks) {
-		const sheet = SpreadsheetApp.openById(id[0]).getSheetByName('April 2023');
+		const sheet = SpreadsheetApp.openById(id[0]).getSheetByName('Mar 2023');
 		for (const [title, after] of changeMap) {
-			console.log(title, after);
+			console.log(title, strToNum[after]);
 		}
 	}
 }
