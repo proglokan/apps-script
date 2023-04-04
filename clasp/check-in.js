@@ -53,6 +53,7 @@ function checkRowIndexColumn() {
 		ordered: [],
 		mixed: [],
 	};
+
 	let colPosition;
 	for (const workbook of extWorkbooks) {
 		const name = workbook[0];
@@ -91,6 +92,7 @@ function pullData() {
 		.getRange(2, 2, consoleSheet.getLastRow() - 1, 2)
 		.getValues();
 
+	// range area
 	const ranges = {
 		initial: 'N3:N',
 		rows: null,
@@ -177,6 +179,7 @@ function searchOrdersMatrix(orders, query) {
 // @return {Array} data → matrix of order data to be used to construct new order objects
 function getInstanceData(instances) {
 	const data = [];
+	// range area
 	const columnIndexes = [3, 4, 5, 6];
 
 	for (let n = 0; n < instances.length; n++) {
@@ -356,7 +359,7 @@ function storeOrder(finalizedOrder) {
 	const column = columnGuide[secret];
 	const joinOrder = `${row}>${weight}>${processingFee}>${packagingFee}>${shippingFee}>${date}>${time}>${status}`;
 	const lastRowInCol =
-		processedSheet.getRange(1, column, 50).getValues().filter(String).length +
+		processedSheet.getRange(1, column, 300).getValues().filter(String).length +
 		1;
 	const range = processedSheet.getRange(lastRowInCol, column);
 	range.setValue(joinOrder);
@@ -408,6 +411,7 @@ function createOrderMatrix(workbookEntries) {
 // @param {Matrix} orderMatrix → matrix of maps where every key is a workbook id and every value is [[order1], [order2], ...
 // @result {Data} → stores finalized & parsed order info in every applicable workbook
 function allocateOrders(orderMatrix) {
+	// range area
 	const col = {
 		status: 19,
 		weight1: 25,

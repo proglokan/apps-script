@@ -121,7 +121,8 @@ function appendSheets() {
 	for (const id of extWorkbooks) {
 		const sheet = SpreadsheetApp.openById(id[0]).getSheetByName('Mar 2023');
 		for (const [title, after] of changeMap) {
-			console.log(title, strToNum[after]);
+			sheet.insertColumnAfter(strToNum[after]);
+			sheet.getRange(1, strToNum[after] + 1).setValue(title);
 		}
 	}
 }
