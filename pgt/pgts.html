@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Document</title>
+		<style>
+			@import url('https://fonts.googleapis.com/css2?family=Raleway:wght@200;300;400;500;600;700;800&display=swap');
+
+			:root {
+				--white: #fff;
+				--black: #000;
+				--light-blue: #d1ded3;
+				--sea-green: #9cbfac;
+				--teracotta-blue: #719d99;
+				--dusk-blue: #45767c;
+				--midnight-blue: #29445d;
+				font-family: 'Raleway', sans-serif;
+			}
+
+			body {
+				margin: 0;
+				padding: 0;
+				height: 100vh;
+				width: 100dvh;
+			}
+
+			main {
+				width: 100%;
+				height: 100%;
+				display: flex;
+				flex-direction: column;
+				justify-content: center;
+				align-items: center;
+			}
+
+			#linkContainer {
+				width: 100%;
+				height: 10rem;
+				display: flex;
+				flex-direction: column;
+				justify-content: center;
+				align-items: center;
+			}
+
+			#link {
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				width: 14rem;
+				aspect-ratio: 6 / 2;
+				color: var(--white);
+				background-color: var(--teracotta-blue);
+				border: 0.125rem solid var(--midnight-blue);
+				border-radius: 0.5rem;
+				font-size: 1.5rem;
+				text-decoration: none;
+			}
+
+			#notice {
+				visibility: hidden;
+				font-size: 1.5rem;
+				color: var(--midnight-blue);
+				background: var(--light-blue);
+				padding: 0 0.5rem 0 0.5rem;
+				border-left: 0.25rem solid var(--midnight-blue);
+			}
+
+			#actionsContainer {
+				width: 100%;
+			}
+
+			#actionButtons {
+				width: 100%;
+				display: flex;
+				flex-direction: row;
+				justify-content: center;
+				align-items: center;
+				gap: 6rem;
+			}
+
+			#pgtCounter {
+				width: fit-content;
+				font-size: 1.5rem;
+				color: var(--midnight-blue);
+			}
+
+			.action {
+				width: 7rem;
+				aspect-ratio: 6 / 2;
+				background-color: var(--dusk-blue);
+				color: var(--white);
+				border: 0.125rem solid var(--midnight-blue);
+				border-radius: 0.5rem;
+				font-size: 1.125rem;
+				outline: none;
+				cursor: pointer;
+			}
+
+			#finishPGTs {
+				width: 100%;
+				height: 10rem;
+				display: flex;
+				flex-direction: column;
+				justify-content: center;
+				align-items: center;
+			}
+
+			#submit {
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				width: 14rem;
+				aspect-ratio: 6 / 1;
+				background-color: var(--light-blue);
+				color: var(--midnight-blue);
+				font-weight: bold;
+				border: 0.125rem solid var(--midnight-blue);
+				border-radius: 0.5rem;
+				font-size: 1.125rem;
+				outline: none;
+				cursor: pointer;
+			}
+		</style>
+	</head>
+	<body>
+		<main>
+			<section id="linkContainer">
+				<a id="link" onclick="middleFunction()" target="_blank">Open PGT</a>
+				<p id="notice">You have reached the end of the list</p>
+			</section>
+			<section id="actionsContainer">
+				<div id="actionButtons">
+					<button class="action" onclick="decrementPosition()">
+						Prev
+						<div class="actionAnimation"></div>
+					</button>
+					<div id="pgtCounter">
+						PGT <span id="currentPGT"></span> out of <span id="totalPGT"></span>
+					</div>
+					<button class="action" onclick="incrementPosition()">
+						Next
+						<div class="actionAnimation"></div>
+					</button>
+				</div>
+			</section>
+			<section id="finishPGTs">
+				<div id="submit">Submit PGT updates</div>
+			</section>
+		</main>
+		<script>
+			// const links = <?= links ?>;
+			const links = [
+				['link 1', '9'],
+				['link 2', '5'],
+				['link 3', '34'],
+				['link 4', '47'],
+			];
+
+			let currentPosition = 0;
+			const link = document.querySelector('#link');
+			const printedLinks = new Set();
+			const currentPGT = document.querySelector('#currentPGT');
+			const totalPGT = document.querySelector('#totalPGT');
+			const submit = document.querySelector('#submit');
+			submit.addEventListener('click', handlePGTs);
+
+			function render() {
+				setCount(currentPosition);
+				setLink(currentPosition);
+			}
+
+			function setCount(currentPosition) {
+				currentPGT.textContent = currentPosition + 1;
+				totalPGT.textContent = links.length;
+			}
+
+			function setLink(currentPosition) {
+				link.href = links[currentPosition][0];
+				link.textContent = `From row: ${links[currentPosition][1]}`;
+			}
+
+			function middleFunction() {
+				setPrintedLinks(currentPosition);
+			}
+
+			function setPrintedLinks(currentPosition) {
+				printedLinks.add(links[currentPosition][1]);
+				console.log([...printedLinks]);
+			}
+
+			function incrementPosition() {
+				currentPosition++;
+				if (currentPosition === links.length) {
+					setNotice();
+					currentPosition--;
+					return;
+				}
+				setCount(currentPosition);
+				setLink(currentPosition);
+			}
+
+			function decrementPosition() {
+				currentPosition--;
+				if (currentPosition === links.length - 2) removeNotice();
+				if (currentPosition < 0) currentPosition = 0;
+				setCount(currentPosition);
+				setLink(currentPosition);
+			}
+
+			function setNotice() {
+				const notice = document.querySelector('#notice');
+				notice.style.visibility = 'visible';
+			}
+
+			function removeNotice() {
+				const notice = document.querySelector('#notice');
+				notice.style.visibility = 'hidden';
+			}
+
+			render();
+
+			function handlePGTs() {
+				google.script.run
+					.withSuccessHandler((response) => {
+						console.log(response);
+					})
+					.withFailureHandler((error) => {
+						console.log(error);
+					})
+					.updatePGTs([...printedLinks]);
+				google.script.host.close();
+			}
+		</script>
+	</body>
+</html>
