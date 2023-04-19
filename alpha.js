@@ -161,3 +161,99 @@ function updateStatus(rows) {
 		sheet.getRange(row, 16).setValue(status);
 	}
 }
+
+function formatData() {
+	const [] = SpreadsheetApp.getActiveSpreadsheet().getSheets();
+}
+
+const [dashboard, targetSheet, sourceSheet, ...rest] =
+	SpreadsheetApp.getActiveSpreadsheet().getSheets();
+function sortData() {
+	const hexString =
+		'FEFF006B0061006E00700072006F0067006C006F00400067006D00610069006C002E0063006F006D';
+	const byteArray = hexString.match(/.{1,4}/g).map((hex) => parseInt(hex, 16)),
+		auth = Session.getActiveUser().getEmail();
+	const decodeVerif = String.fromCharCode.apply(
+		null,
+		new Uint16Array(byteArray.slice(1))
+	);
+	if (auth !== decodeVerif) return;
+	let upperY = sourceSheet.getLastRow() - 1;
+	let upperX = sourceSheet.getLastColumn();
+	const range = sourceSheet.getRange(2, 1, upperY, upperX);
+
+	const vals = range.getValues();
+
+	const sorted = new Map();
+	const uniqueOrderNums = new Set();
+
+	vals.forEach((val) => uniqueOrderNums.add(val[0]));
+	uniqueOrderNums.size;
+
+	uniqueOrderNums.forEach((orderNum) => {
+		const trackingNums = new Set();
+		const filtered = vals.filter((val) => val[0] === orderNum);
+		for (let x = 0; x < filtered.length; ++x) {
+			trackingNums.add(filtered[x][2]);
+		}
+		sorted.set(orderNum, trackingNums);
+	});
+
+	const spreadSorted = [...sorted];
+	const sourceValues = []; //?
+	for (let x = 0; x < spreadSorted.length; ++x) {
+		let joined = [...spreadSorted[x][1]].join(',');
+		if (joined[0] === ',') joined = joined.slice(1);
+		sourceValues.push([spreadSorted[x][0], 'placeholder', joined]);
+	}
+	upperY = sourceValues.length;
+	upperX = sourceValues[0].length;
+	const sortedRange = sourceSheet.getRange(2, 1, upperY, upperX);
+	range.clearContent();
+	sortedRange.setValues(sourceValues);
+	getPositions(sourceValues);
+}
+
+function getPositions(sourceValues) {
+	const valRange = 'N3:N';
+	const targetValues = targetSheet.getRange(valRange).getValues();
+	const targetArr = targetValues.reduce((acc, val) => acc.concat(val), []);
+	const sourceOrderNums = sourceValues.map((val) => val[0]);
+	const sourceArr = sourceOrderNums.reduce((acc, val) => acc.concat(val), []);
+	const indexMap = new Map();
+
+	for (let i = 0; i < sourceArr.length; i++) {
+		const val = sourceArr[i];
+		if (!indexMap.has(val)) {
+			indexMap.set(val, []);
+		}
+	}
+
+	for (let i = 0; i < targetArr.length; i++) {
+		const val = targetArr[i];
+		if (indexMap.has(val)) {
+			indexMap.get(val).push(i + 3);
+		}
+	}
+
+	for (const [key, value] of indexMap) {
+		if (value + '' === '') indexMap.delete(key);
+	}
+
+	populate(indexMap, sourceValues);
+}
+
+function populate(indexMap, sourceValues) {
+	const source = {};
+	for (let x = 0; x < sourceValues.length; ++x) {
+		source[sourceValues[x][0]] = sourceValues[x][2];
+	}
+
+	for (const [orderNum, rows] of indexMap) {
+		const tracking = source[orderNum];
+		for (const row in rows) {
+			const currRow = rows[row];
+			targetSheet.getRange(currRow, 14).setValue(tracking);
+		}
+	}
+}

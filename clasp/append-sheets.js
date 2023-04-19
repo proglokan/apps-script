@@ -109,20 +109,25 @@ function appendSheets() {
 	const extWorkbooks = consoleSheet
 		.getRange(2, 2, consoleSheet.getLastRow() - 1)
 		.getValues();
-	const changeMap = new Map();
+	const changes = new Map();
 
 	// const stringToEval = getFromSomething();
-	changeMap.set('PGT Shipped Date', 'aa');
-	changeMap.set('Tracking #2', 'w');
-	changeMap.set('Shipping Provider', 't');
-	changeMap.set('Shipping Service', 't');
-	changeMap.set('Shipping Fee', 'c');
+  
+  changes.set('PO #', 'ad');
+  changes.set('PGT Shipping Paid', 'ac');
+  changes.set('PGT Prep Fee', 'ac');
+	changes.set('PGT Shipped Date', 'aa');
+	changes.set('Tracking #2', 'w');
+	changes.set('Shipping Provider', 't');
+	changes.set('Shipping Service', 't');
+	changes.set('Shipping Fee', 'c');
 
 	for (const id of extWorkbooks) {
 		const sheet = SpreadsheetApp.openById(id[0]).getSheetByName('Mar 2023');
-		for (const [title, after] of changeMap) {
+		for (const [title, after] of changes) {
 			sheet.insertColumnAfter(strToNum[after]);
 			sheet.getRange(1, strToNum[after] + 1).setValue(title);
 		}
+    sheet.setName('Order Management');
 	}
 }

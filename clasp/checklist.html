@@ -658,6 +658,7 @@
 				}
 			}
 			const orders = JSON.parse(<?= JSON.stringify(orders) ?>);
+      console.log(orders);
 			// All that good logic
 
 			function addButtonListeners() {
@@ -712,6 +713,7 @@
 			function displayOrderID(order) {
 				// Display the order ID on the page
 				const orderID = document.querySelector('.orderID');
+        console.log(order);
 				orderID.textContent = order.query;
 			}
 
@@ -768,11 +770,15 @@
 			}
 
 			function displayWeight(order) {
+        console.log(`order: ${order}`);
+        console.log(`order.weight = ${order.weight}`);
 				if (!order.weight) return;
 				const weight = document.querySelector('#weightValue');
         const splitWeight = document.querySelector('#splitWeight');
 				const regex = /\+/i;
+        console.log(!regex.test(order.weight));
 				if (!regex.test(order.weight)) {
+          console.log(true);
 					weight.textContent = order.weight;
           splitWeight.textContent = '✓ Split shipment';
 					return;

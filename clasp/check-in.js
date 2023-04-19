@@ -40,7 +40,7 @@ class Order {
 	}
 }
 
-const [consoleSheet, dataSheet, querySheet, skuSheet, processedSheet] =
+const [consoleSheet, dataSheet, querySheet, skuSheet, processedSheet, ...rest] =
 	SpreadsheetApp.getActive().getSheets();
 
 // @result {UI} → shows the status of the `Row` column for each workbook, green is sorted, red is not
@@ -89,7 +89,7 @@ function checkRowIndexColumn() {
 // @result {Data} → pulls data from all external workbooks and puts it into the dataSheet
 function pullData() {
 	const extWorkbooks = consoleSheet
-		.getRange(2, 2, consoleSheet.getLastRow() - 1, 2)
+		.getRange(2, 2, 1, 2)
 		.getValues();
 
 	// range area
@@ -103,6 +103,7 @@ function pullData() {
 
 	for (const sheet of extWorkbooks) {
 		const [id, secret] = sheet;
+    Logger.log(id);
 		const currSheet = SpreadsheetApp.openById(id).getSheetByName('Mar 2023');
 		const initialData = currSheet.getRange(ranges.initial).getValues();
 		let length = initialData.length - 1;
@@ -331,7 +332,7 @@ function initFinalVals(order) {
 // @result {Data} → stores finalized order in order log, formatted as row>weight>processingFee>packagingFee>date>time>status
 function storeOrder(finalizedOrder) {
 	const columnGuide = {
-		'#ffffff': 1,
+		'#ffffff': 13,
 		'#fefefe': 2,
 		'#fdfdfd': 3,
 		'#fcfcfc': 4,
@@ -343,7 +344,7 @@ function storeOrder(finalizedOrder) {
 		'#f6f6f6': 10,
 		'#f5f5f5': 11,
 		'#f4f4f4': 12,
-		'#f3f3f3': 13,
+		'#f3f3f3': 1,
 	};
 	const {
 		secret,
@@ -380,13 +381,14 @@ function endOfDay() {
 function instantiateWorkbooks() {
 	const workbookEntries = {};
 	const rows = consoleSheet.getLastRow();
-	const range = consoleSheet.getRange(2, 2, rows, 2);
+	const range = consoleSheet.getRange(2, 2, rows-1, 2);
 	const workbookData = range.getValues();
 	for (const workbook of workbookData) {
 		const id = workbook[0];
 		const secret = workbook[1];
 		workbookEntries[secret] = id;
 	}
+  console.log(workbookEntries);
 	return workbookEntries;
 }
 
@@ -398,7 +400,7 @@ function createOrderMatrix(workbookEntries) {
 	for (let n = 1; n <= columns; n++) {
 		const secret = processedSheet.getRange(1, n).getBackground();
 		const id = workbookEntries[secret];
-		const range = processedSheet.getRange(2, n, 49, 1);
+		const range = processedSheet.getRange(2, n, 300, 1);
 		const rawVals = range.getValues();
 		const vals = rawVals.filter(String);
 		const map = new Map();
@@ -421,7 +423,6 @@ function allocateOrders(orderMatrix) {
 		processingFee: null,
 		packagingFee: null,
 	};
-
 	for (const map of orderMatrix) {
 		for (const [id, vals] of map) {
 			const sheet = SpreadsheetApp.openById(id).getSheetByName('Mar 2023');
@@ -458,6 +459,7 @@ function allocateOrders(orderMatrix) {
 					if (key === 'row') continue;
 					sheet.getRange(orderKVP.row, col[key]).setValue(orderKVP[key]);
 				}
+        Logger.log(val);
 			});
 		}
 	}
