@@ -1,11 +1,14 @@
 function pgt() {
-	const sheet = SpeadsheetApp.getActiveSpreadsheet().getSheetByName('Mar 2023');
+	const sheet =
+		SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Mar 2023');
 	const range = 'AB3:AA';
 	const rawVals = sheet.getRange(range).getValues();
 
 	const links = rawVals
 		.map((val, index) => {
-			if (val[0] !== 'PGT Issued') return null;
+			if (val[0] !== 'PGT Issued') {
+				return null;
+			}
 			val = [val[1], index + 3];
 			return val;
 		})

@@ -1,4 +1,5 @@
 'use strict';
+
 class Order {
 	// @param {Integer} row → row of order in dataSheet
 	// @param {String | Integer} orderId → supplier orderId or tracking number
@@ -88,37 +89,68 @@ function checkRowIndexColumn() {
 
 // @result {Data} → pulls data from all external workbooks and puts it into the dataSheet
 function pullData() {
-	const extWorkbooks = consoleSheet.getRange(2, 2, 1, 2).getValues();
+	const extWorkbookData = getExternalWorkbookData();
+	const headers = getHeaders(extWorkbookData[0][0]);
+	const titles = [
+		'PO#',
+		'Customer Name',
+		'Customer Phone Number',
+		'Ship to Address 1',
+		'Ship to Address 2',
+		'City',
+		'State',
+		'Zip',
+		'Item Description',
+		'Qty',
+		'SKU',
+		'Inbound Notes',
+		'Units',
+		'Inbound PO',
+		'Inbound Order ID',
+		'Inbound Tracking(s)',
+		'Outbound Status',
+	];
 
-	// range area
-	const ranges = {
-		initial: 'N3:N',
-		rows: null,
-		supplierValues: 'N3:O',
-		orderValues: 'AP3:AR',
-		rowValues: 'AV3:AV',
-	};
+	const [
+		clientPo,
+		customerName,
+		customerPhone,
+		address1,
+		address2,
+		city,
+		state,
+		zip,
+		itemDescription,
+		qty,
+		sku,
+		inboundNotes,
+		units,
+		inboundPo,
+		inboundOrderId,
+		inboundTracking,
+		outboundStatus,
+	] = titles;
 
-	for (const sheet of extWorkbooks) {
+	for (const sheet of extWorkbookData) {
 		const [id, secret] = sheet;
-		Logger.log(id);
-		const currSheet = SpreadsheetApp.openById(id).getSheetByName('Mar 2023');
-		const initialData = currSheet.getRange(ranges.initial).getValues();
-		let length = initialData.length - 1;
-		while (length > 0 && initialData[length][0] === '') length--;
-		if (length === 0) continue;
-		ranges.rows = length;
-		const supplierValues = currSheet
-			.getRange(ranges.supplierValues)
-			.getValues();
-		const orderValues = currSheet.getRange(ranges.orderValues).getValues();
-		const rowValues = currSheet.getRange(ranges.rowValues).getValues();
-		const concatenatedValues = [];
-		for (let n = 0; n < ranges.rows; n++) {
-			concatenatedValues[n] = supplierValues[n].concat(
-				orderValues[n].concat(rowValues[n])
-			);
-		}
+		const currSheet =
+			SpreadsheetApp.openById(id).getSheetByName('Order Management');
+
+		const upperX = currSheet.getLastColumn();
+		const upperY = currSheet.getLastRow();
+		const range = currSheet.getRange(2, 1, upperY, upperX);
+		const values = range.getValues();
+
+		const pendingRows = values.filter(
+			(row) =>
+				row[outboundStatus - 1] === 'Pending' ||
+				row[outboundStatus - 1] === 'Stop Shipment'
+		);
+		const pendingValues = pendingRows.map((row) => {
+			return headers.map((header, index) => {
+				return row[index];
+			});
+		});
 
 		const lastRow = dataSheet.getLastRow() + 1;
 
@@ -134,14 +166,36 @@ function pullData() {
 	}
 }
 
+function getExternalWorkbookData() {
+	return consoleSheet.getRange(2, 2, 1, 2).getValues();
+}
+
 // @result {Process} → prep data for checklist process
-function regionalControlCenter9() {
+function regionalControlCenter9(headers = null) {
 	const orders = getOrders();
 	const query = getNextQuery();
 	const instances = searchOrdersMatrix(orders, query);
 	const data = getInstanceData(instances);
 	const newOrders = createNewOrders(data, query);
 	displayChecklist(newOrders);
+}
+
+function getHeaders(id) {
+	const sheet = SpreadsheetApp.openById(id).getSheetByName('Order Management');
+	const upperX = orderManagementSheet.getLastColumn();
+
+	const headersRow = orderManagementSheet
+		.getRange(1, 1, 1, upperX)
+		.getValues()[0];
+	headersRow.unshift('spacer');
+
+	const headers = new Map();
+
+	headersRow.forEach((header, index) => {
+		headers.set(header, index + 1);
+	});
+
+	return headers;
 }
 
 // @return {Matrix} orders → row of matrix = [supplierID, tracking, ...others]
@@ -176,10 +230,12 @@ function searchOrdersMatrix(orders, query) {
 
 // @param {Array} instances → array of row indexes
 // @return {Array} data → matrix of order data to be used to construct new order objects
-function getInstanceData(instances) {
+function getInstanceData(instances, headers) {
 	const data = [];
 	// range area
 	const columnIndexes = [3, 4, 5, 6];
+	const columnNames = [];
+	const [] = columnNames.map((name) => headers.indexOf(name));
 
 	for (let n = 0; n < instances.length; n++) {
 		const newData = [];
@@ -368,7 +424,7 @@ function storeOrder(finalizedOrder) {
 	regionalControlCenter9();
 }
 
-// @result {Process} → handle data after warehouse is finished, returns information to every applicable workbook
+// @result {Data} → handle data after warehouse is finished, returns information to every applicable workbook
 function endOfDay() {
 	const workbookEntries = instantiateWorkbooks();
 	const orderMatrix = createOrderMatrix(workbookEntries);
