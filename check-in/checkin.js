@@ -109,6 +109,7 @@ function pullData() {
 		'Inbound Order ID',
 		'Inbound Tracking(s)',
 		'Outbound Status',
+		'Outbound Label(s)',
 	];
 
 	const [
@@ -129,6 +130,7 @@ function pullData() {
 		inboundOrderId,
 		inboundTracking,
 		outboundStatus,
+		outboundLabels,
 	] = titles;
 
 	for (const sheet of extWorkbookData) {
