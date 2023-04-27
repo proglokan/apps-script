@@ -1,3 +1,5 @@
+'use strict';
+// @param {Result} → store and pass all cell val & index to the client-side
 function pgt() {
 	const sheet =
 		SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Mar 2023');
@@ -21,6 +23,7 @@ function pgt() {
 	ui.showModelessDialog(html, 'PGTs');
 }
 
+// @param {Result} → overwrite all applicable cells with 'PGT Sent'
 function updatePGTs(printedLinks) {
 	for (const row of printedLinks) {
 		sheet.getRange(row, 28).setValue('PGT Sent');
