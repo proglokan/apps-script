@@ -7,7 +7,7 @@ class Order {
 	// @param {String} sku → sku of product
 	// @param {Integer} quantity → quantity of product in order
 	// @param {String} secret → indicates the workbook the order came fromk
-	constructor(productName, query, quantity, sku, row, secret) {
+	constructor(productName, query, quantity, sku, row, secret, status) {
 		this.productName = productName;
 		this.query = query;
 		this.quantity = quantity;
@@ -17,6 +17,7 @@ class Order {
 		this.weight = null;
 		this.packageMap = null;
 		this.fragile = null;
+		this.status = status; // pending or stop shipment
 	}
 
 	// @param {String} sku → sku of product
