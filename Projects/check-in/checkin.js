@@ -45,53 +45,79 @@ class Order {
 const [consoleSheet, dataSheet, querySheet, skuSheet, processedSheet, ...rest] =
 	SpreadsheetApp.getActive().getSheets();
 
-// @result {UI} → shows the status of the `Row` column for each workbook, green is sorted, red is not
-function checkRowIndexColumn() {
-	const extWorkbooks = consoleSheet
-		.getRange(2, 1, consoleSheet.getLastRow() - 1, 2)
+function getExternalWorkbookData() {
+	return consoleSheet
+		.getRange(2, 2, consoleSheet.getLastRow() - 1, 2)
 		.getValues();
+}
 
+function startOfDay() {
+	const workbookData = getExternalWorkbookData();
+	const workbookStatuses = getWorkbookStatuses(workbookData);
+	const errorInWorkbooks = checkWorkbookStatuses(workbookStatuses);
+	if (errorInWorkbooks) {
+		displayWorkbookStatus(workbookStatuses);
+		return;
+	}
+
+	getAndPostData(workbookData);
+}
+
+function getWorkbookStatuses(workbookData) {
 	const statuses = {
 		ordered: [],
-		mixed: [],
+		unordered: [],
 	};
 
-	let colPosition;
-	for (const workbook of extWorkbooks) {
-		const name = workbook[0];
-		const id = workbook[1];
-		const sheet = SpreadsheetApp.openById(id).getSheetByName('Mar 2023');
-		if (!sheet) continue;
-		const headersRange = sheet.getRange(1, 1, 1, sheet.getLastColumn());
-		const headers = headersRange.getValues()[0];
-		const col = headers.indexOf('Row') + 1;
-		colPosition = col;
-		const rowIndexRange = sheet.getRange(1, col, sheet.getLastRow());
-		const rowIndexes = rowIndexRange
+	for (const workbook of workbookData) {
+		const [id, secret] = workbook;
+		const sheet =
+			SpreadsheetApp.openById(id).getSheetByName('Order Management');
+		const headers = getHeaders(id, sheet);
+		const col = headers.get('Pointer');
+		const upperY = sheet.getLastRow();
+		const rowPointersRange = sheet.getRange(2, col, upperY, 1);
+
+		const rowPointersStrings = rowPointersRange
 			.getValues()
 			.filter(Number)
 			.join(',')
 			.split(',');
-		const vals = rowIndexes.map((val) => +val);
-		const isSorted = vals.every((v, i, a) => !i || a[i - 1] <= v);
+
+		const rowPointers = rowPointersStrings.map((pointer) => +pointer);
+
+		const isSorted = rowPointers.every(
+			(val, index, arr) => !index || arr[index - 1] <= val
+		);
 		if (isSorted) {
-			statuses.ordered.push(name);
+			statuses.ordered.push(secret);
 			continue;
 		}
-		statuses.mixed.push(name);
+		statuses.unordered.push(secret);
 	}
 
-	const template = HtmlService.createTemplateFromFile('row-check');
-	template.statuses = statuses;
-	const html = template.evaluate().setWidth(1000).setHeight(800);
+	if (statuses.unordered.length) return statuses;
+	return false;
+}
+
+function checkWorkbookStatuses(workbookStatuses) {
+	if (!workbookStatuses) return false;
+	if (workbookStatuses.unordered.length) return true;
+}
+
+function displayWorkbookStatus(workbookStatuses) {
+	const template = HtmlService.createTemplateFromFile('workbook-status');
+	template.workbookStatuses = workbookStatuses;
+	const html = template.evaluate().setWidth(400).setHeight(400);
 	const ui = SpreadsheetApp.getUi();
-	ui.showModelessDialog(html, `Row #${colPosition} statuses`);
+	ui.showModelessDialog(html, 'Workbook Statuses');
 }
 
 // @result {Data} → pulls data from all external workbooks and puts it into the dataSheet
-function pullData() {
-	const extWorkbookData = getExternalWorkbookData();
-	const headers = getHeaders(extWorkbookData[0][0]);
+function getAndPostData(workbookData) {
+	const [id, secret] = workbookData[0];
+
+	const headers = getHeaders(id, null);
 	const titles = [
 		'PO#',
 		'Customer Name',
@@ -113,28 +139,7 @@ function pullData() {
 		'Outbound Label(s)',
 	];
 
-	const [
-		clientPo,
-		customerName,
-		customerPhone,
-		address1,
-		address2,
-		city,
-		state,
-		zip,
-		itemDescription,
-		qty,
-		sku,
-		inboundNotes,
-		units,
-		inboundPo,
-		inboundOrderId,
-		inboundTracking,
-		outboundStatus,
-		outboundLabels,
-	] = titles;
-
-	for (const sheet of extWorkbookData) {
+	for (const sheet of workbookData) {
 		const [id, secret] = sheet;
 		const currSheet =
 			SpreadsheetApp.openById(id).getSheetByName('Order Management');
@@ -143,34 +148,32 @@ function pullData() {
 		const upperY = currSheet.getLastRow();
 		const range = currSheet.getRange(2, 1, upperY, upperX);
 		const values = range.getValues();
+		for (const value of values) value.unshift('spacer');
+		const outboundIndex = headers.get('Outbound Status');
 
-		const pendingRows = values.filter(
+		const targetRows = values.filter(
 			(row) =>
-				row[outboundStatus - 1] === 'Pending' ||
-				row[outboundStatus - 1] === 'Stop Shipment'
+				row[outboundIndex] === 'Outbound Pending' ||
+				row[outboundIndex] === 'Stop Shipment' ||
+				row[outboundIndex] === 'Label Ready'
 		);
-		const pendingValues = pendingRows.map((row) => {
-			return headers.map((header, index) => {
-				return row[index];
+
+		const targetValues = targetRows.map((row) => {
+			return titles.map((title) => {
+				return row[headers.get(title)];
 			});
 		});
 
-		const lastRow = dataSheet.getLastRow() + 1;
-
-		dataSheet
-			.getRange(
-				lastRow,
-				1,
-				concatenatedValues.length,
-				concatenatedValues[0].length
-			)
-			.setValues(concatenatedValues)
-			.setBackground(secret);
+		postData(targetValues, secret);
 	}
 }
 
-function getExternalWorkbookData() {
-	return consoleSheet.getRange(2, 2, 1, 2).getValues();
+function postData(targetValues, secret) {
+	const upperX = targetValues[0].length;
+	const upperY = targetValues.length;
+	const startingRow = dataSheet.getLastRow() + 1;
+	const valuesRange = dataSheet.getRange(startingRow, 1, upperY, upperX);
+	valuesRange.setValues(targetValues).setBackground(secret);
 }
 
 // @result {Process} → prep data for checklist process
@@ -183,19 +186,18 @@ function regionalControlCenter9(headers = null) {
 	displayChecklist(newOrders);
 }
 
-function getHeaders(id) {
-	const sheet = SpreadsheetApp.openById(id).getSheetByName('Order Management');
-	const upperX = orderManagementSheet.getLastColumn();
+function getHeaders(id, sheet) {
+	if (!sheet)
+		sheet = SpreadsheetApp.openById(id).getSheetByName('Order Management');
+	const upperX = sheet.getLastColumn();
 
-	const headersRow = orderManagementSheet
-		.getRange(1, 1, 1, upperX)
-		.getValues()[0];
+	const headersRow = sheet.getRange(1, 1, 1, upperX).getValues()[0];
 	headersRow.unshift('spacer');
 
 	const headers = new Map();
 
 	headersRow.forEach((header, index) => {
-		headers.set(header, index + 1);
+		headers.set(header, index);
 	});
 
 	return headers;

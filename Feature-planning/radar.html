@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>Development Profile Tool</title>
+		<meta
+			name="viewport"
+			content="width=device-width, initial-scale=1.0, user-scalable=no"
+		/>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.6.0/chart.min.js"></script>
+		<script src="assets/chartjs-plugin-dragdata.min.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-dragdata@2.2.3/dist/chartjs-plugin-dragdata.min.js"></script>
+		<style>
+			@import url('https://fonts.googleapis.com/css2?family=Raleway:wght@200;300;400;500;600;700;800&display=swap');
+
+			:root {
+				--white-color: #ffffff;
+				--cream-color: #efe3c7;
+				--orange-color: #cc973d;
+				--red-color: #c14a4a;
+				--pine-color: #6c782c;
+				--blue-color: #45707a;
+				--green-color: #4c7a5d;
+				--purple-color: #945e80;
+				font-family: 'Raleway', sans-serif;
+			}
+
+			html,
+			body {
+				margin: 0;
+				padding: 0;
+				width: 100%;
+				height: 100%;
+				background-color: var(--cream-color);
+			}
+
+			#chartContainer {
+				width: 100%;
+				height: fit-content;
+				display: flex;
+				flex-direction: column;
+				justify-content: center;
+				align-items: center;
+			}
+
+			#valuesContainer {
+				border-top: 0.125rem solid var(--green-color);
+				border-bottom: 0.125rem solid var(--green-color);
+				width: 100%;
+				height: fit-content;
+				display: flex;
+				flex-direction: row;
+				justify-content: space-evenly;
+				align-items: center;
+			}
+
+			canvas {
+				width: 40rem;
+				aspect-ratio: 1;
+				padding: 0;
+				background-color: var(--cream-color);
+			}
+
+			p {
+				margin: 0.5rem;
+				padding: 0;
+				font-size: 1.25rem;
+			}
+
+			#export {
+				width: 10rem;
+				aspect-ratio: 10 / 3;
+				margin: 5rem;
+				border: none;
+				border-radius: 0.5rem;
+				background-color: var(--blue-color);
+				color: var(--white-color);
+				font-size: 1.25rem;
+				cursor: pointer;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div id="chartContainer">
+			<canvas id="chartJSContainer"></canvas>
+			<div id="valuesContainer">
+				<p>Adaptability: <span id="adaptability"></span></p>
+				<p>Velocity: <span id="velocity"></span></p>
+				<p>Performance: <span id="performance"></span></p>
+			</div>
+			<button id="export">Export</button>
+		</div>
+		<script>
+			const vals = {
+				adaptiblity: 50,
+				velocity: 50,
+				performance: 50,
+			};
+
+			const colors = {
+				white: '#ffffff',
+				cream: '#efe3c7',
+				orange: '#cc973d',
+				red: '#c14a4a',
+				pine: '#6c782c',
+				blue: '#45707a',
+				green: '#4c7a5d',
+				purple: '#945e80',
+			};
+
+			const indexToString = ['adaptiblity', 'velocity', 'performance'];
+
+			const options = {
+				type: 'radar',
+				data: {
+					labels: ['Adaptiblity', 'Velocity', 'Performance'],
+					datasets: [
+						{
+							label: 'Development Profile',
+							data: [vals.adaptiblity, vals.velocity, vals.performance],
+							pointHitRadius: 25,
+							backgroundColor: `${colors.red}40`,
+							borderColor: colors.red,
+							pointBackgroundColor: colors.red,
+							pointBorderColor: colors.red,
+							pointHoverBackgroundColor: colors.white,
+							pointHoverBorderColor: colors.blue,
+						},
+					],
+				},
+				options: {
+					responsive: false,
+					layout: {
+						padding: 5,
+					},
+					onHover: (event) => {
+						const point = event.chart.getElementsAtEventForMode(
+							event,
+							'nearest',
+							{ intersect: true },
+							false
+						);
+						if (point.length) event.native.target.style.cursor = 'grab';
+						else event.native.target.style.cursor = 'default';
+					},
+					plugins: {
+						legend: {
+							display: false,
+						},
+						tooltip: {
+							enabled: false,
+						},
+						dragData: {
+							round: 1,
+							showTooltip: false,
+							onDrag: (event, datasetIndex, index, value) => {
+								event.target.style.cursor = 'grabbing';
+								vals[indexToString[index]] = Math.round(value);
+								displayVals();
+							},
+							onDragEnd: (e, datasetIndex, index, value) => {
+								event.target.style.cursor = 'default';
+							},
+						},
+					},
+					scales: {
+						r: {
+							pointLabels: {
+								color: colors.purple,
+								font: {
+									size: 18,
+								},
+							},
+							grid: {
+								color: colors.purple,
+							},
+							ticks: {
+								font: {
+									size: 14,
+									color: 'red',
+								},
+								backdropColor: 'transparent',
+							},
+							angleLines: {
+								color: colors.purple,
+							},
+							max: 100,
+							min: 0,
+							stepSize: 1,
+						},
+					},
+				},
+			};
+
+			function displayVals() {
+				document.querySelector(
+					'#adaptability'
+				).innerHTML = `${vals.adaptiblity}`;
+				document.querySelector('#velocity').innerHTML = `${vals.velocity}`;
+				document.querySelector(
+					'#performance'
+				).innerHTML = `${vals.performance}`;
+			}
+
+			const ctx = document.querySelector('#chartJSContainer').getContext('2d');
+			const radar = new Chart(ctx, options);
+			document.querySelector('#export').onclick = function () {
+				const download = document.createElement('a');
+				download.href = radar.toBase64Image('image/png', 1);
+				download.download = 'dev-profile.png';
+				download.click();
+			};
+			displayVals();
+		</script>
+	</body>
+</html>
