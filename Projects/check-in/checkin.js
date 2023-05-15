@@ -6,7 +6,7 @@ class Order {
 	// @param {String} productName → name of product
 	// @param {String} sku → sku of product
 	// @param {Integer} quantity → quantity of product in order
-	// @param {String} secret → indicates the workbook the order came fromk
+	// @param {String} secret → indicates the workbook the order came from
 	constructor(productName, query, quantity, sku, row, secret, status) {
 		this.productName = productName;
 		this.query = query;
@@ -42,12 +42,18 @@ class Order {
 	}
 }
 
-const [consoleSheet, dataSheet, querySheet, skuSheet, processedSheet, ...rest] =
-	SpreadsheetApp.getActive().getSheets();
+const [
+	clientDataSheet,
+	dataSheet,
+	querySheet,
+	skuSheet,
+	processedSheet,
+	...rest
+] = SpreadsheetApp.getActive().getSheets();
 
 function getExternalWorkbookData() {
-	return consoleSheet
-		.getRange(2, 2, consoleSheet.getLastRow() - 1, 2)
+	return clientDataSheet
+		.getRange(2, 2, clientDataSheet.getLastRow() - 1, 2)
 		.getValues();
 }
 
@@ -389,22 +395,23 @@ function initFinalVals(order) {
 
 // @param {Object} finalizedOrder → order object with finalized values
 // @result {Data} → stores finalized order in order log, formatted as row>weight>processingFee>packagingFee>date>time>status
+// DEV NOTE: stop shipment format is ROW>STOPPED>PROCESSING FEE>0>0>MM/DD/YYYY>TIME>Shipment Stopped
 function storeOrder(finalizedOrder) {
-	const columnGuide = {
-		'#ffffff': 13,
-		'#fefefe': 2,
-		'#fdfdfd': 3,
-		'#fcfcfc': 4,
-		'#fbfbfb': 5,
-		'#fafafa': 6,
-		'#f9f9f9': 7,
-		'#f8f8f8': 8,
-		'#f7f7f7': 9,
-		'#f6f6f6': 10,
-		'#f5f5f5': 11,
-		'#f4f4f4': 12,
-		'#f3f3f3': 1,
+	const columnPositions = () => {
+		const upperX = clientDataSheet.getLastColumn();
+		const upperY = clientDataSheet.getLastRow();
+		const clientDataRange = clientDataSheet.getRange(2, upperX, upperY + 1, 1);
+		const clientData = clientDataRange.getValues().join(',').split(',');
+		const indexes = formattedClientData.map((secret, index) => index + 2);
+		const columnPositions = {};
+		for (let x = 0; x < indexes.length; x++) {
+			const secret = clientData[x];
+			const index = indexes[x];
+			columnPositions[secret] = index;
+		}
+		return columnPositions;
 	};
+
 	const {
 		secret,
 		row,
@@ -416,7 +423,8 @@ function storeOrder(finalizedOrder) {
 		time,
 		status,
 	} = finalizedOrder;
-	const column = columnGuide[secret];
+
+	const column = columnPositions[secret];
 	const joinOrder = `${row}>${weight}>${processingFee}>${packagingFee}>${shippingFee}>${date}>${time}>${status}`;
 	const lastRowInCol =
 		processedSheet.getRange(1, column, 300).getValues().filter(String).length +
@@ -439,8 +447,8 @@ function endOfDay() {
 // @return {Object} workbookEntries → object with secret as key and workbook id as value
 function instantiateWorkbooks() {
 	const workbookEntries = {};
-	const rows = consoleSheet.getLastRow();
-	const range = consoleSheet.getRange(2, 2, rows - 1, 2);
+	const rows = clientDataSheet.getLastRow();
+	const range = clientDataSheet.getRange(2, 2, rows - 1, 2);
 	const workbookData = range.getValues();
 	for (const workbook of workbookData) {
 		const id = workbook[0];
@@ -472,7 +480,6 @@ function createOrderMatrix(workbookEntries) {
 // @param {Matrix} orderMatrix → matrix of maps where every key is a workbook id and every value is [[order1], [order2], ...
 // @result {Data} → stores finalized & parsed order info in every applicable workbook
 function allocateOrders(orderMatrix) {
-	// range area
 	const col = {
 		status: 19,
 		weight1: 25,

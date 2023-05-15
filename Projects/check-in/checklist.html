@@ -201,7 +201,6 @@
 			}
 
 			#orderStatus {
-				/* visibility: hidden; */
 				display: flex;
 				justify-content: center;
 				align-items: center;
@@ -209,7 +208,6 @@
 				height: 4rem;
 				border-radius: 1rem;
 				font-size: larger;
-				background-color: var(--green-color);
 				color: var(--cream-color);
 			}
 
@@ -256,10 +254,19 @@
 				color: var(--orange-color);
 			}
 
+			.headerData {
+				font-size: 1.2rem;
+				font-weight: 600;
+				color: var(--orange-color);
+			}
+
+			/* DEV NOTE: combine .headerData and .orderID, .productQuantity > p:first-of-type, .fragile > p, .packagingSection > p, .case > p */
+
 			.productQuantity,
 			.fragile,
 			.packagingSection,
-			.case {
+			.case,
+			#productPacks {
 				display: flex;
 				flex-direction: column;
 				gap: 0.5rem;
@@ -439,21 +446,23 @@
 			<span id="rightHalfOfArrow"></span>
 		</span>
 		<div id="form">
-			<div id="orderStatus" onclick="handleStopShipment()">
-				<!-- Handle Stop Shipment (❁´◡`❁) -->
-				Good to go ╰(*°▽°*)╯
-			</div>
+			<div id="orderStatus"></div>
+
 			<div class="productTitle">
 				<p>Product Title:</p>
 				<select name="productTitle" id="productTitle"></select>
 			</div>
 			<div class="productOrderID">
-				<p>Order ID:</p>
+				<p class="headerData">Order ID:</p>
 				<p class="orderID"></p>
 			</div>
 			<div class="productQuantity">
-				<p>Quantity:</p>
+				<p class="headerData">Quantity:</p>
 				<p class="quantity"></p>
+			</div>
+			<div id="productPacks">
+				<p class="headerData">Packs:</p>
+				<p id="packs" class="headerData"></p>
 			</div>
 
 			<div class="fragile">
@@ -659,8 +668,8 @@
 					this.order = order;
 				}
 			}
+
 			// const orders = JSON.parse(<?= JSON.stringify(orders) ?>);
-			// All that good logic
 
 			function addButtonListeners() {
 				const value = document.querySelector('#weightValue');
@@ -698,6 +707,7 @@
 				displayFragile(order);
 				displayPackaging(order);
 				displayWeight(order);
+				setOrderStatus(order);
 			}
 
 			function displayOrder(e) {
@@ -709,7 +719,35 @@
 				displayFragile(order);
 				displayPackaging(order);
 				displayWeight(order);
+				setOrderStatus(order);
 			}
+
+			function setOrderStatus(order) {
+				const orderStatus = document.querySelector('#orderStatus');
+				const status = order.status;
+				disableStatusBar();
+				switch (true) {
+					case status === 'Stop Shipment':
+						orderStatus.textContent = 'Stop Shipment (❁´◡`❁)';
+						orderStatus.style.backgroundColor = 'var(--red-color)';
+						activateStatusBar(orderStatus);
+						break;
+					case status === 'Label Ready':
+						// DEV NOTE: write logic to handle 1 step orders
+						break;
+					default:
+						orderStatus.textContent = 'Good to go ╰(*°▽°*)╯';
+						orderStatus.style.backgroundColor = 'var(--green-color)';
+						break;
+				}
+			}
+
+			function activateStatusBar(orderStatus) {
+				orderStatus.style.cursor = 'pointer';
+				orderStatus.addEventListener('click', handleStopShipment);
+			}
+
+			function handleStopShipment() {}
 
 			function displayOrderID(order) {
 				// Display the order ID on the page
@@ -902,19 +940,17 @@
 				const titleElement = printWindow.document.createElement('p');
 				titleElement.style.fontSize = '1.25rem';
 				titleElement.style.position = 'absolute';
-				titleElement.style.width = '100%';
-				titleElement.style.marginRight = '15rem';
-				titleElement.style.transform = 'rotate(90deg)';
+				titleElement.style.width = '29.125rem';
+				titleElement.style.transform = 'rotate(90deg) translateY(60%)';
 				titleElement.innerText = title;
 
 				const barcode = new Image();
 				barcode.src = barcodeUrl;
-				barcode.style.transform = 'rotate(90deg)';
-				barcode.style.padding = '1rem 1rem 1rem 1rem';
+				barcode.style.transform = 'rotate(90deg) translateY(-50%)';
 				barcode.onload = () => {
 					const targetContent = printWindow.document.createElement('div');
-					targetContent.style.width = '384px';
-					targetContent.style.aspect = '6/4';
+					targetContent.style.width = '20rem';
+					targetContent.style.height = '30rem';
 					targetContent.style.display = 'flex';
 					targetContent.style.justifyContent = 'center';
 					targetContent.style.alignItems = 'center';
