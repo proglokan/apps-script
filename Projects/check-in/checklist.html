@@ -473,134 +473,55 @@
 					<input type="radio" id="no" name="fragile" value="no" />
 					<label for="no">No</label>
 				</div>
-				<small class="warning" id="fragileWarning"
-					>Please select `Yes` or `No`</small
-				>
+				<small class="warning" id="fragileWarning">Please select `Yes` or `No`</small>
 			</div>
 
 			<div class="packagingSection">
 				<p>Packaging:</p>
 				<div>
 					<div>
-						<input
-							class="packageRadio"
-							type="radio"
-							id="asis"
-							name="packaging"
-							value="asis"
-							required
-						/>
+						<input class="packageRadio" type="radio" id="asis" name="packaging" value="asis" required />
 						<label for="asis">As is</label>
 					</div>
 					<div>
-						<input
-							class="packageRadio"
-							type="radio"
-							id="tripleZero"
-							name="packaging"
-							value="000"
-							required
-						/>
+						<input class="packageRadio" type="radio" id="tripleZero" name="packaging" value="000" required />
 						<label for="tripleZero">000</label>
 					</div>
 					<div>
-						<input
-							class="packageRadio"
-							type="radio"
-							id="three"
-							name="packaging"
-							value="3"
-							required
-						/>
+						<input class="packageRadio" type="radio" id="three" name="packaging" value="3" required />
 						<label for="three">3</label>
 					</div>
 					<div>
-						<input
-							class="packageRadio"
-							type="radio"
-							id="bb3"
-							name="packaging"
-							value="BB3"
-							required
-						/>
+						<input class="packageRadio" type="radio" id="bb3" name="packaging" value="BB3" required />
 						<label for="bb3">BB3</label>
 					</div>
 					<div>
-						<input
-							class="packageRadio"
-							type="radio"
-							id="five"
-							name="packaging"
-							value="5"
-							required
-						/>
+						<input class="packageRadio" type="radio" id="five" name="packaging" value="5" required />
 						<label for="five">5</label>
 					</div>
 					<div>
-						<input
-							class="packageRadio"
-							type="radio"
-							id="bb5"
-							name="packaging"
-							value="BB5"
-							required
-						/>
+						<input class="packageRadio" type="radio" id="bb5" name="packaging" value="BB5" required />
 						<label for="bb5">BB5</label>
 					</div>
 					<div>
-						<input
-							class="packageRadio"
-							type="radio"
-							id="seven"
-							name="packaging"
-							value="7"
-							required
-						/>
+						<input class="packageRadio" type="radio" id="seven" name="packaging" value="7" required />
 						<label for="seven">7</label>
 					</div>
 					<div>
-						<input
-							class="packageRadio"
-							type="radio"
-							id="bb7"
-							name="packaging"
-							value="BB7"
-							required
-						/>
+						<input class="packageRadio" type="radio" id="bb7" name="packaging" value="BB7" required />
 						<label for="bb7">BB7</label>
 					</div>
 					<div>
-						<input
-							class="packageRadio"
-							type="radio"
-							id="bb9"
-							name="packaging"
-							value="BB9"
-							required
-						/>
+						<input class="packageRadio" type="radio" id="bb9" name="packaging" value="BB9" required />
 						<label for="bb9">BB9</label>
 					</div>
 					<div>
-						<input
-							class="packageRadio"
-							type="radio"
-							id="bb24"
-							name="packaging"
-							value="BB24"
-							required
-						/>
+						<input class="packageRadio" type="radio" id="bb24" name="packaging" value="BB24" required />
 						<label for="bb24">BB24</label>
 					</div>
 				</div>
 				<div>
-					<input
-						class="packageRadio"
-						type="radio"
-						id="box"
-						name="packaging"
-						value="box"
-						required
-					/>
+					<input class="packageRadio" type="radio" id="box" name="packaging" value="box" required />
 					<label for="box">Box</label>
 				</div>
 				<select name="boxDropdown" id="boxDropdown" disabled>
@@ -614,9 +535,7 @@
 					<option value="18x18x24">M18l → 18x18x24</option>
 					<option value="24x24x24">M24 → 24x24x24</option>
 				</select>
-				<small class="warning" id="packageMapWarning"
-					>Package map cannot be blank</small
-				>
+				<small class="warning" id="packageMapWarning">Package map cannot be blank</small>
 			</div>
 			<section id="weight">
 				<div id="weightValContainer">
@@ -633,13 +552,7 @@
 			</section>
 			<section id="print">
 				<div id="targetContent"></div>
-				<button
-					class="button"
-					onclick="generateAndPrintBarcode()"
-					id="barcodeBtn"
-				>
-					Generate Barcode
-				</button>
+				<button class="button" onclick="generateAndPrintBarcode()" id="barcodeBtn">Generate Barcode</button>
 			</section>
 
 			<div class="case">
@@ -724,11 +637,11 @@
 
 			function setOrderStatus(order) {
 				const orderStatus = document.querySelector('#orderStatus');
-				const status = order.status;
+				const status = order.outboundStatus;
 				disableStatusBar();
 				switch (true) {
 					case status === 'Stop Shipment':
-						orderStatus.textContent = 'Stop Shipment (❁´◡`❁)';
+						orderStatus.textContent = 'Stop this shipment (❁´◡`❁)';
 						orderStatus.style.backgroundColor = 'var(--red-color)';
 						activateStatusBar(orderStatus);
 						break;
@@ -744,10 +657,27 @@
 
 			function activateStatusBar(orderStatus) {
 				orderStatus.style.cursor = 'pointer';
-				orderStatus.addEventListener('click', handleStopShipment);
+				orderStatus.addEventListener('click', stopThisShipment);
 			}
 
-			function handleStopShipment() {}
+			function stopThisShipment() {
+				const index = document.querySelector('#productTitle').value;
+				const order = orders[index];
+
+				const inventoryData = {
+					productName: order.productName,
+					packs: order.packs,
+				};
+
+				google.script.run
+					.withSuccessHandler((response) => {
+						console.log(`Success: ${response}`);
+					})
+					.withFailureHandler((response) => {
+						console.log(`Failure: ${response}`);
+					})
+					.handleStoppedShipment(inventoryData);
+			}
 
 			function displayOrderID(order) {
 				// Display the order ID on the page
@@ -792,9 +722,7 @@
 				}
 
 				const regex = new RegExp(order.packageMap, 'i');
-				const boxTest = Array.from(boxDropdown.options).some((node) =>
-					regex.test(node.value)
-				);
+				const boxTest = Array.from(boxDropdown.options).some((node) => regex.test(node.value));
 
 				if (boxTest && order.packageMap !== null) {
 					document.querySelector('#box').checked = true;
@@ -850,9 +778,7 @@
 				const order = orders[index];
 
 				const fragile = document.querySelector('input[name="fragile"]:checked');
-				let packageMap = document.querySelector(
-					'input[name="packaging"]:checked'
-				);
+				let packageMap = document.querySelector('input[name="packaging"]:checked');
 				const weight = document.querySelector('#weightValue').textContent;
 
 				if (valsMissing(fragile, packageMap, weight)) return;
@@ -923,11 +849,7 @@
 
 				const barcodeUrl = `https:\/\/barcodeapi.org\/api\/128\/%23${secret}%3e${row}%3e${shipments}`;
 
-				const printWindow = window.open(
-					'',
-					'Print Window',
-					'height=1000,width=1000'
-				);
+				const printWindow = window.open('', 'Print Window', 'height=1000,width=1000');
 
 				const printBody = printWindow.document.querySelector('body');
 				printBody.style.width = '100%';
@@ -1017,19 +939,13 @@
 			function createSku(order, weight, packageMap, fragile) {
 				if (order.weight) return false;
 
-				if (packageMap.value === 'box')
-					order.packageMap = document.querySelector('#boxDropdown').value;
+				if (packageMap.value === 'box') order.packageMap = document.querySelector('#boxDropdown').value;
 				else order.packageMap = packageMap.value;
 
 				if (order.splitWeight) order.weight = `${+weight}+${order.splitWeight}`;
 				else order.weight = +weight;
 				order.fragile = fragile.value;
-				order.sku = [
-					order.sku,
-					order.weight,
-					order.packageMap,
-					order.fragile,
-				].join('|');
+				order.sku = [order.sku, order.weight, order.packageMap, order.fragile].join('|');
 				return true;
 			}
 

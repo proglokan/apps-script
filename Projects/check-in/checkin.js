@@ -7,17 +7,53 @@ class Order {
 	// @param {String} sku → sku of product
 	// @param {Integer} quantity → quantity of product in order
 	// @param {String} secret → indicates the workbook the order came from
-	constructor(productName, query, quantity, sku, row, secret, status) {
-		this.productName = productName;
-		this.query = query;
+	constructor(
+		poNum,
+		customerName,
+		customerPhone,
+		addressOne,
+		addressTwo,
+		city,
+		state,
+		zip,
+		itemDescription,
+		quantity,
+		sku,
+		inboundNotes,
+		units,
+		inboundPO,
+		inboundOrderID,
+		inboundTracking,
+		outboundStatus,
+		outboundLabel,
+		pointer,
+		secret,
+		query
+	) {
+		this.poNum = poNum;
+		this.customerName = customerName;
+		this.customerPhone = customerPhone;
+		this.addressOne = addressOne;
+		this.addressTwo = addressTwo;
+		this.city = city;
+		this.state = state;
+		this.zip = zip;
+		this.itemDescription = itemDescription;
 		this.quantity = quantity;
 		this.sku = sku;
-		this.row = row;
+		this.inboundNotes = inboundNotes;
+		this.units = units;
+		this.inboundPO = inboundPO;
+		this.inboundOrderID = inboundOrderID;
+		this.inboundTracking = inboundTracking;
+		this.outboundStatus = outboundStatus;
+		this.outboundLabel = outboundLabel;
+		this.pointer = pointer;
 		this.secret = secret;
+		this.query = query;
 		this.weight = null;
 		this.packageMap = null;
 		this.fragile = null;
-		this.status = status; // pending or stop shipment
 	}
 
 	// @param {String} sku → sku of product
@@ -42,19 +78,10 @@ class Order {
 	}
 }
 
-const [
-	clientDataSheet,
-	dataSheet,
-	querySheet,
-	skuSheet,
-	processedSheet,
-	...rest
-] = SpreadsheetApp.getActive().getSheets();
+const [clientDataSheet, dataSheet, querySheet, skuSheet, processedSheet, ...rest] = SpreadsheetApp.getActive().getSheets();
 
 function getExternalWorkbookData() {
-	return clientDataSheet
-		.getRange(2, 2, clientDataSheet.getLastRow() - 1, 2)
-		.getValues();
+	return clientDataSheet.getRange(2, 2, clientDataSheet.getLastRow() - 1, 2).getValues();
 }
 
 function startOfDay() {
@@ -77,24 +104,17 @@ function getWorkbookStatuses(workbookData) {
 
 	for (const workbook of workbookData) {
 		const [id, secret] = workbook;
-		const sheet =
-			SpreadsheetApp.openById(id).getSheetByName('Order Management');
+		const sheet = SpreadsheetApp.openById(id).getSheetByName('Order Management');
 		const headers = getHeaders(id, sheet);
 		const col = headers.get('Pointer');
 		const upperY = sheet.getLastRow();
 		const rowPointersRange = sheet.getRange(2, col, upperY, 1);
 
-		const rowPointersStrings = rowPointersRange
-			.getValues()
-			.filter(Number)
-			.join(',')
-			.split(',');
+		const rowPointersStrings = rowPointersRange.getValues().filter(Number).join(',').split(',');
 
 		const rowPointers = rowPointersStrings.map((pointer) => +pointer);
 
-		const isSorted = rowPointers.every(
-			(val, index, arr) => !index || arr[index - 1] <= val
-		);
+		const isSorted = rowPointers.every((val, index, arr) => !index || arr[index - 1] <= val);
 		if (isSorted) {
 			statuses.ordered.push(secret);
 			continue;
@@ -143,12 +163,12 @@ function getAndPostData(workbookData) {
 		'Inbound Tracking(s)',
 		'Outbound Status',
 		'Outbound Label(s)',
+		'Pointer',
 	];
 
 	for (const sheet of workbookData) {
 		const [id, secret] = sheet;
-		const currSheet =
-			SpreadsheetApp.openById(id).getSheetByName('Order Management');
+		const currSheet = SpreadsheetApp.openById(id).getSheetByName('Order Management');
 
 		const upperX = currSheet.getLastColumn();
 		const upperY = currSheet.getLastRow();
@@ -158,10 +178,7 @@ function getAndPostData(workbookData) {
 		const outboundIndex = headers.get('Outbound Status');
 
 		const targetRows = values.filter(
-			(row) =>
-				row[outboundIndex] === 'Outbound Pending' ||
-				row[outboundIndex] === 'Stop Shipment' ||
-				row[outboundIndex] === 'Label Ready'
+			(row) => row[outboundIndex] === 'Outbound Pending' || row[outboundIndex] === 'Stop Shipment' || row[outboundIndex] === 'Label Ready'
 		);
 
 		const targetValues = targetRows.map((row) => {
@@ -193,8 +210,7 @@ function regionalControlCenter9(headers = null) {
 }
 
 function getHeaders(id, sheet) {
-	if (!sheet)
-		sheet = SpreadsheetApp.openById(id).getSheetByName('Order Management');
+	if (!sheet) sheet = SpreadsheetApp.openById(id).getSheetByName('Order Management');
 	const upperX = sheet.getLastColumn();
 
 	const headersRow = sheet.getRange(1, 1, 1, upperX).getValues()[0];
@@ -240,13 +256,16 @@ function searchOrdersMatrix(orders, query) {
 }
 
 // @param {Array} instances → array of row indexes
-// @return {Array} data → matrix of order data to be used to construct new order objects
-function getInstanceData(instances, headers) {
+// @return {Array} data → each position represents a column from 1 to upperX, last position is secret
+function getInstanceData(instances) {
 	const data = [];
-	// range area
-	const columnIndexes = [3, 4, 5, 6];
-	const columnNames = [];
-	const [] = columnNames.map((name) => headers.indexOf(name));
+
+	const columnIndexes = () => {
+		const upperX = dataSheet.getLastColumn();
+		const indexes = [];
+		for (let x = 1; x <= upperX; ++x) indexes.push(n);
+		return indexes;
+	};
 
 	for (let n = 0; n < instances.length; n++) {
 		const newData = [];
@@ -259,6 +278,7 @@ function getInstanceData(instances, headers) {
 		newData.push(secret);
 		data.push(newData);
 	}
+
 	return data;
 }
 
@@ -267,8 +287,53 @@ function getInstanceData(instances, headers) {
 function createNewOrders(data, query) {
 	const ordersObj = [];
 	for (let n = 0; n < data.length; n++) {
-		const [productName, quantity, sku, row, secret] = data[n];
-		const order = new Order(productName, query, quantity, sku, row, secret);
+		const [
+			poNum,
+			customerName,
+			customerPhone,
+			addressOne,
+			addressTwo,
+			city,
+			state,
+			zip,
+			itemDescription,
+			quantity,
+			sku,
+			inboundNotes,
+			units,
+			inboundPO,
+			inboundOrderID,
+			inboundTracking,
+			outboundStatus,
+			outboundLabel,
+			pointer,
+			secret,
+		] = data[n];
+
+		const order = new Order(
+			poNum,
+			customerName,
+			customerPhone,
+			addressOne,
+			addressTwo,
+			city,
+			state,
+			zip,
+			itemDescription,
+			quantity,
+			sku,
+			inboundNotes,
+			units,
+			inboundPO,
+			inboundOrderID,
+			inboundTracking,
+			outboundStatus,
+			outboundLabel,
+			pointer,
+			secret,
+			query
+		);
+
 		order.getSku(sku);
 		ordersObj.push(order);
 	}
@@ -395,7 +460,7 @@ function initFinalVals(order) {
 
 // @param {Object} finalizedOrder → order object with finalized values
 // @result {Data} → stores finalized order in order log, formatted as row>weight>processingFee>packagingFee>date>time>status
-// DEV NOTE: stop shipment format is ROW>STOPPED>PROCESSING FEE>0>0>MM/DD/YYYY>TIME>Shipment Stopped
+// DEV NOTE: store every processed order in a single column in the order log, then use store secret to determine where to store the order
 function storeOrder(finalizedOrder) {
 	const columnPositions = () => {
 		const upperX = clientDataSheet.getLastColumn();
@@ -412,28 +477,14 @@ function storeOrder(finalizedOrder) {
 		return columnPositions;
 	};
 
-	const {
-		secret,
-		row,
-		weight,
-		processingFee,
-		packagingFee,
-		shippingFee,
-		date,
-		time,
-		status,
-	} = finalizedOrder;
+	const { secret, row, weight, processingFee, packagingFee, shippingFee, date, time, status } = finalizedOrder;
 
 	const column = columnPositions[secret];
 	const joinOrder = `${row}>${weight}>${processingFee}>${packagingFee}>${shippingFee}>${date}>${time}>${status}`;
-	const lastRowInCol =
-		processedSheet.getRange(1, column, 300).getValues().filter(String).length +
-		1;
+	const lastRowInCol = processedSheet.getRange(1, column, 300).getValues().filter(String).length + 1;
 	const range = processedSheet.getRange(lastRowInCol, column);
 	range.setValue(joinOrder);
-	SpreadsheetApp.getActive().toast(
-		`Stored at row: ${lastRowInCol} col: ${column}`
-	);
+	SpreadsheetApp.getActive().toast(`Stored at row: ${lastRowInCol} col: ${column}`);
 	regionalControlCenter9();
 }
 
@@ -494,16 +545,7 @@ function allocateOrders(orderMatrix) {
 			const sheet = SpreadsheetApp.openById(id).getSheetByName('Mar 2023');
 			vals.forEach((val) => {
 				const orderInfo = val[0].split('>');
-				let [
-					row,
-					weight1,
-					processingFee,
-					packagingFee,
-					shippingFee,
-					date,
-					time,
-					status,
-				] = orderInfo;
+				let [row, weight1, processingFee, packagingFee, shippingFee, date, time, status] = orderInfo;
 				let weight2 = null;
 				if (isNaN(+weight1)) {
 					[weight1, weight2] = weight1.split('+');
@@ -529,4 +571,28 @@ function allocateOrders(orderMatrix) {
 			});
 		}
 	}
+}
+
+function handleStoppedShipment(inventoryData) {
+	const { productName, units } = inventoryData;
+	const upperY = inventorySheet.getLastRow();
+	const dataRange = inventorySheet.getRange(2, 1, upperY, 1);
+	const data = dataRange.getValues();
+
+	const regex = new RegExp(productName, 'i');
+
+	let row = null,
+		index = 0;
+
+	while (row === null) {
+		const cell = data[index][0];
+		const productNameExists = regex.test(cell);
+		if (productNameExists) row = index + 2;
+	}
+
+	const unitsRange = inventorySheet.getRange(row, 2);
+	const unitsInStock = unitsRange.getValue();
+	const newUnits = +unitsInStock + +units;
+	unitsRange.setValue(newUnits);
+	regionalControlCenter9();
 }

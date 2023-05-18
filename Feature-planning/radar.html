@@ -3,10 +3,7 @@
 	<head>
 		<meta charset="utf-8" />
 		<title>Development Profile Tool</title>
-		<meta
-			name="viewport"
-			content="width=device-width, initial-scale=1.0, user-scalable=no"
-		/>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.6.0/chart.min.js"></script>
 		<script src="assets/chartjs-plugin-dragdata.min.js"></script>
 		<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-dragdata@2.2.3/dist/chartjs-plugin-dragdata.min.js"></script>
@@ -31,7 +28,6 @@
 				padding: 0;
 				width: 100%;
 				height: 100%;
-				background-color: var(--cream-color);
 			}
 
 			#chartContainer {
@@ -58,7 +54,6 @@
 				width: 40rem;
 				aspect-ratio: 1;
 				padding: 0;
-				background-color: var(--cream-color);
 			}
 
 			p {
@@ -135,12 +130,7 @@
 						padding: 5,
 					},
 					onHover: (event) => {
-						const point = event.chart.getElementsAtEventForMode(
-							event,
-							'nearest',
-							{ intersect: true },
-							false
-						);
+						const point = event.chart.getElementsAtEventForMode(event, 'nearest', { intersect: true }, false);
 						if (point.length) event.native.target.style.cursor = 'grab';
 						else event.native.target.style.cursor = 'default';
 					},
@@ -194,13 +184,9 @@
 			};
 
 			function displayVals() {
-				document.querySelector(
-					'#adaptability'
-				).innerHTML = `${vals.adaptiblity}`;
+				document.querySelector('#adaptability').innerHTML = `${vals.adaptiblity}`;
 				document.querySelector('#velocity').innerHTML = `${vals.velocity}`;
-				document.querySelector(
-					'#performance'
-				).innerHTML = `${vals.performance}`;
+				document.querySelector('#performance').innerHTML = `${vals.performance}`;
 			}
 
 			const ctx = document.querySelector('#chartJSContainer').getContext('2d');
