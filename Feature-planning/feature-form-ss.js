@@ -1,29 +1,41 @@
-function createIssue() {
-	window.fetch(
-		'https://proglo.jetbrains.space/api/http/projects/id:4J1kZu3nIGOB/planning/issues',
-		{
-			method: 'POST',
-			headers: {
-				Authorization:
-					'Bearer eyJhbGciOiJSUzUxMiJ9.eyJzdWIiOiI0TlFVZ1k0TnZGQTkiLCJhdWQiOiJjaXJjbGV0LXdlYi11aSIsIm9yZ0RvbWFpbiI6InByb2dsbyIsInNjb3BlIjoiKioiLCJuYW1lIjoia2Fud29vZHkiLCJpc3MiOiJodHRwczpcL1wvcHJvZ2xvLmpldGJyYWlucy5zcGFjZSIsInByaW5jaXBhbF90eXBlIjoiVVNFUiIsImV4cCI6MTY4MzMyMzQ3MywiaWF0IjoxNjgzMzIyODczLCJzaWQiOiIzNmRXRHUyWWZoak8ifQ.TklHImXWQlV7JUYUuQK2dCnzrwasS55geTW7DllGhc8bJ-M033800nz5JsNeu7aKZo_gBzw6TwAx2NgmdUx3syDjdbCE0Tx9LlTxf7p2KWXRMjdYgTegNZemanfsZIqJB6_7Iqk19F4hY-gtng56-TSFWzjqllWrQTvjlf4nZqE',
-				Accept: 'application/json',
-				'Content-Type': 'application/json',
-			},
-			body: JSON.stringify({
-				title: 'TITLE',
-				description: 'DESCRIPTION',
-				assignee: 'me',
-				status: 'Open',
-				attachments: [],
-				customFields: [
-					{
-						fieldId: '1',
-						value: {
-							className: 'AutonumberCFValue',
-						},
-					},
-				],
-			}),
-		}
-	);
+function renderTemplate() {
+	const template = HtmlService.createTemplateFromFile('feature-documentation-cs');
+	const html = template.evaluate().setWidth(1000).setHeight(800);
+	const ui = SpreadsheetApp.getUi();
+	ui.showModelessDialog(html, `Feature Documentation`);
+}
+
+function createIssue(title, description) {
+	const url = 'https://proglo.jetbrains.space/api/http/projects/id:4J1kZu3nIGOB/planning/issues';
+	const options = {
+		method: 'POST',
+		headers: {
+			Authorization:
+				'Bearer eyJhbGciOiJSUzUxMiJ9.eyJzdWIiOiI0TlFVZ1k0TnZGQTkiLCJhdWQiOiJjaXJjbGV0LXdlYi11aSIsIm9yZ0RvbWFpbiI6InByb2dsbyIsIm5hbWUiOiJrYW53b29keSIsImlzcyI6Imh0dHBzOlwvXC9wcm9nbG8uamV0YnJhaW5zLnNwYWNlIiwicGVybV90b2tlbiI6IjJDdUdGQjBBallsSiIsInByaW5jaXBhbF90eXBlIjoiVVNFUiIsImlhdCI6MTY4NTAwNjQ1Mn0.mM8Ho_yf1WQb6tob6Hi8pYtM3b1SrUNxKILKNiBrH81YkCcfSuxDiY_X08fMpZARGwmAAVNDnY_vLCxlU2fa8jFDJKHbfs4p-yUxlRmF5PbZZWukWFL9IW8jD-PDDAVO5bnE4Q6MtAsY2ZpsmQapM-jwQS7EHNLIMPseJOMgk4A',
+			Accept: 'application/json',
+			'Content-Type': 'application/json',
+		},
+		body: JSON.stringify({
+			title: title,
+			description: description,
+			assignee: 'me',
+			status: '3osHW93T6ybM',
+		}),
+		muteHttpExceptions: true,
+	};
+
+	const response = UrlFetchApp.fetch(url, options);
+	const responseCode = response.getResponseCode();
+	const responseBody = response.getContentText();
+
+	Logger.log(`
+  code: ${responseCode}
+  response body: ${responseBody}
+  options body: ${options.body}
+  `);
+}
+
+function emailIssue(subject, body) {
+	const recipient = 'kanproglo@gmail.com';
+	GmailApp.sendEmail(recipient, subject, body);
 }

@@ -4,6 +4,9 @@
 		<meta charset="UTF-8" />
 		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.6.0/chart.min.js"></script>
+		<script src="assets/chartjs-plugin-dragdata.min.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-dragdata@2.2.3/dist/chartjs-plugin-dragdata.min.js"></script>
 		<title>Document</title>
 		<style>
 			@import url('https://fonts.googleapis.com/css2?family=Raleway:wght@200;300;400;500;600;700;800&display=swap');
@@ -32,12 +35,22 @@
 				gap: 3rem;
 			}
 
+			main {
+				width: 90%;
+				height: fit-content;
+				padding-bottom: 5rem;
+				margin-top: 1rem;
+				background: var(--cream);
+				border-radius: 2rem;
+				border: 0.125rem solid var(--orange);
+			}
+
 			#questionaireContainer {
 				width: 100%;
-				height: 30rem;
+				height: 28rem;
 				display: flex;
 				flex-direction: column;
-				justify-content: flex-start;
+				justify-content: center;
 				align-items: center;
 				gap: 0.5rem;
 			}
@@ -49,6 +62,14 @@
 			label {
 				font-weight: 700;
 				color: var(--green);
+			}
+
+			input {
+				width: 30rem;
+				aspect-ratio: 20 / 1;
+				border: 0.2rem solid var(--green);
+				border-radius: 0.5rem;
+				outline: none;
 			}
 
 			.indicator {
@@ -65,6 +86,11 @@
 				opacity: 25%;
 			}
 
+			.valid {
+				background: var(--green);
+				color: var(--white);
+			}
+
 			button {
 				width: 10rem;
 				font-size: 1.25rem;
@@ -74,6 +100,10 @@
 				color: var(--white);
 				border: none;
 				border-radius: 0.5rem;
+			}
+
+			#previousNode {
+				opacity: 70%;
 			}
 
 			#controls,
@@ -93,12 +123,53 @@
 				gap: 1rem;
 			}
 
-			input {
-				width: 25rem;
-				aspect-ratio: 20 / 1;
-				border: 0.2rem solid var(--green);
+			#continue {
+				opacity: 70%;
+			}
+
+			#chartContainer {
+				width: 100%;
+				height: fit-content;
+				display: flex;
+				flex-direction: column;
+				justify-content: center;
+				align-items: center;
+			}
+
+			#valuesContainer {
+				border-top: 0.125rem solid var(--green);
+				border-bottom: 0.125rem solid var(--green);
+				width: 100%;
+				height: fit-content;
+				display: flex;
+				flex-direction: row;
+				justify-content: space-evenly;
+				align-items: center;
+			}
+
+			canvas {
+				width: 30rem;
+				aspect-ratio: 1;
+				padding: 0;
+				transform: translateX(-5%);
+			}
+
+			p {
+				margin: 0.5rem;
+				padding: 0;
+				font-size: 1.25rem;
+			}
+
+			#export {
+				width: 10rem;
+				aspect-ratio: 10 / 3;
+				margin: 5rem;
+				border: none;
 				border-radius: 0.5rem;
-				outline: none;
+				background-color: var(--blue);
+				color: var(--white);
+				font-size: 1.25rem;
+				cursor: pointer;
 			}
 		</style>
 	</head>
@@ -120,8 +191,11 @@
 				</div>
 				<button id="nextNode" onclick="nextNode()">Next</button>
 			</section>
+			<section id="chartContainer">
+				<button id="continue">Continue</button>
+			</section>
 		</main>
-		<script>
+		<script defer>
 			'use strict';
 			class DoublyLinkedList {
 				constructor() {
@@ -148,33 +222,44 @@
 			}
 
 			const questionaire = new DoublyLinkedList();
-
+			let totalInputs = 0;
+			const userInput = {};
 			function createQuestionaireNodes() {
-				const headings = ['Core details', 'Scalability', 'Required data', 'Feature design', 'Testing', 'Dependency(s)', 'Steps or training before deployment'];
-
-				const labels = [
-					['Describe the functionality of this feature:', 'Will additional automation assist with the implementation of this feature?'],
-					['Higher scale?', 'Lower scale?'],
+				const contents = new Map([
 					[
-						'Describe the data',
-						'Where does this data originate',
-						'Give an example of this data',
-						'How will this data be stored?',
-						'Will this data need to be manipulated to be usable?',
+						'Core details',
+						[
+							['Title this ticket', 'Describe the functionality of this feature', 'Will additional automation assist with the implementation of this feature?'],
+							0,
+						],
 					],
-					['Affects on user interface', 'Affects on user experience'],
-					['Use cases and the expected results', 'Edge cases and the expected results', 'Scenario/Environment required to test'],
-					['Description of dependency(s)', 'Reasoning for requirement'],
-					['Steps or training required for the online team', 'Steps or training required for the warehouse team'],
-				];
+					['Scalability', [['Functionality at higher scale?', 'Functionality at lower scale?'], 1]],
+					[
+						'Required data',
+						[
+							[
+								'Describe the required data and give an example',
+								'Where does this data originate and how will this data be stored?',
+								'Will this data need to be manipulated to be usable?',
+							],
+							2,
+						],
+					],
+					['Feature design', [['Affects on user interface', 'Affects on user experience'], 3]],
+					['Testing', [['Use cases and the expected results', 'Edge cases and the expected results', 'Scenario/Environment required to test'], 4]],
+					['Dependency(s)', [['Description of dependency(s)', 'Reasoning for requirement(s)'], 5]],
+					['Steps or training before deployment', [['Steps or training required for the online team', 'Steps or training required for the warehouse team'], 6]],
+				]);
 
-				for (let x = 0; x < headings.length; ++x) {
-					questionaire.append({ index: x, heading: headings[x], labels: labels[x] });
+				for (const [key, value] of contents) {
+					totalInputs += value[0].length;
+					questionaire.append({ heading: key, labels: value });
 				}
 			}
 
-			function updateHead(questionaireHead) {
+			function setQuestions(questionaireHead, initializing) {
 				const questionaireContainer = document.querySelector('#questionaireContainer');
+				const inputs = [...questionaireContainer.querySelectorAll('input')];
 
 				questionaireContainer.innerHTML = '';
 
@@ -183,19 +268,243 @@
 
 				questionaireContainer.appendChild(heading);
 
-				for (let x = 0; x < questionaireHead.labels.length; ++x) {
+				for (let x = 0; x < questionaireHead.labels[0].length; ++x) {
 					const label = document.createElement('label');
-					label.innerText = questionaireHead.labels[x];
-
+					label.innerText = questionaireHead.labels[0][x];
 					const input = document.createElement('input');
+
+					input.addEventListener('keyup', () => {
+						if (input.value.toLowerCase() === 'n/a' || input.value.length > 20) input.classList.add('valid');
+						else input.classList.remove('valid');
+					});
+
+					const id = labelToId(label.innerText);
+					input.id = id;
+
+					input.addEventListener('blur', () => {
+						if (!input.classList.contains('valid')) return;
+						const key = idToLabel(input.id);
+						const val = input.value;
+						storeInput(val, input.id);
+						if (Object.keys(userInput).length === totalInputs) activateContinueButton();
+					});
+
+					if (userInput[idToLabel(id)]) (input.value = userInput[idToLabel(id)]), input.classList.add('valid');
+					else input.value = '';
 
 					questionaireContainer.appendChild(label);
 					questionaireContainer.appendChild(input);
 				}
 			}
 
+			function storeInput(value, id) {
+				userInput[idToLabel(id)] = value;
+				console.log(userInput);
+			}
+
+			function activateContinueButton() {
+				const continueButton = document.querySelector('#continue');
+				continueButton.addEventListener('click', () => {
+					// clearForm();
+					// renderChart();
+					prepIssueData(userInput);
+				});
+				continueButton.style.opacity = '100%';
+			}
+
+			function clearForm() {
+				const mainContent = document.querySelector('main');
+				mainContent.innerHTML = '';
+			}
+
+			function renderChart() {
+				renderHTML();
+				const vals = {
+					adaptiblity: 50,
+					velocity: 50,
+					performance: 50,
+				};
+
+				const colors = {
+					white: '#ffffff',
+					cream: '#efe3c7',
+					orange: '#cc973d',
+					red: '#c14a4a',
+					pine: '#6c782c',
+					blue: '#45707a',
+					green: '#4c7a5d',
+					purple: '#945e80',
+				};
+
+				const indexToString = ['adaptiblity', 'velocity', 'performance'];
+
+				const options = {
+					type: 'radar',
+					data: {
+						labels: ['Adaptiblity', 'Velocity', 'Performance'],
+						datasets: [
+							{
+								label: 'Development Profile',
+								data: [vals.adaptiblity, vals.velocity, vals.performance],
+								pointHitRadius: 25,
+								backgroundColor: `${colors.red}40`,
+								borderColor: colors.red,
+								pointBackgroundColor: colors.red,
+								pointBorderColor: colors.red,
+								pointHoverBackgroundColor: colors.white,
+								pointHoverBorderColor: colors.blue,
+							},
+						],
+					},
+					options: {
+						responsive: false,
+						layout: {
+							padding: 5,
+						},
+						onHover: (event) => {
+							const point = event.chart.getElementsAtEventForMode(event, 'nearest', { intersect: true }, false);
+							if (point.length) event.native.target.style.cursor = 'grab';
+							else event.native.target.style.cursor = 'default';
+						},
+						plugins: {
+							legend: {
+								display: false,
+							},
+							tooltip: {
+								enabled: false,
+							},
+							dragData: {
+								round: 1,
+								showTooltip: false,
+								onDrag: (event, datasetIndex, index, value) => {
+									event.target.style.cursor = 'grabbing';
+									vals[indexToString[index]] = Math.round(value);
+									displayVals();
+								},
+								onDragEnd: (e, datasetIndex, index, value) => {
+									event.target.style.cursor = 'default';
+								},
+							},
+						},
+						scales: {
+							r: {
+								pointLabels: {
+									color: colors.purple,
+									font: {
+										size: 18,
+									},
+								},
+								grid: {
+									color: colors.purple,
+								},
+								ticks: {
+									font: {
+										size: 14,
+										color: 'red',
+									},
+									backdropColor: 'transparent',
+								},
+								angleLines: {
+									color: colors.purple,
+								},
+								max: 100,
+								min: 0,
+								stepSize: 1,
+							},
+						},
+					},
+				};
+
+				function displayVals() {
+					document.querySelector('#adaptability').innerHTML = `${vals.adaptiblity}`;
+					document.querySelector('#velocity').innerHTML = `${vals.velocity}`;
+					document.querySelector('#performance').innerHTML = `${vals.performance}`;
+				}
+
+				const ctx = document.querySelector('#chartJSContainer').getContext('2d');
+				const radar = new Chart(ctx, options);
+				document.querySelector('#export').onclick = function () {
+					const image = radar.toBase64Image();
+				};
+				displayVals();
+			}
+
+			function prepIssueData(userInput) {
+				const title = `New Ticket: ${userInput['Title this ticket']}`;
+				delete userInput['Title this ticket'];
+				const description = JSON.stringify(userInput).replace(/"|{|}/g, '').split(',').join('\n').replace(/:/g, ' → ');
+				google.script.run.emailIssue(title, description);
+				google.script.host.close();
+			}
+
+			function renderHTML() {
+				const mainContent = document.querySelector('main');
+
+				const chartContainer = document.createElement('div');
+				chartContainer.id = 'chartContainer';
+				mainContent.appendChild(chartContainer);
+
+				const canvas = document.createElement('canvas');
+				canvas.id = 'chartJSContainer';
+				chartContainer.appendChild(canvas);
+
+				const valuesContainer = document.createElement('div');
+				valuesContainer.id = 'valuesContainer';
+				chartContainer.appendChild(valuesContainer);
+
+				const adaptability = document.createElement('p');
+				adaptability.innerHTML = `Adaptability: <span id="adaptability"></span>`;
+				const velocity = document.createElement('p');
+				velocity.innerHTML = `Velocity: <span id="velocity"></span>`;
+				const performance = document.createElement('p');
+				performance.innerHTML = `Performance: <span id="performance"></span>`;
+
+				valuesContainer.appendChild(adaptability);
+				valuesContainer.appendChild(velocity);
+				valuesContainer.appendChild(performance);
+
+				const exportButton = document.createElement('button');
+				exportButton.id = 'export';
+				exportButton.innerText = 'Export';
+
+				chartContainer.appendChild(exportButton);
+			}
+
+			function validInputs(inputs) {
+				if (inputs.every((input) => input.classList.contains('valid'))) return true;
+				else return false;
+			}
+
+			function throwErrorFlag(inputs) {
+				inputs.forEach((input) => {
+					if (!input.classList.contains('valid')) {
+						input.animate(
+							[
+								{ transform: 'rotate(1.25deg)' },
+								{ transform: 'rotate(-1.25deg)' },
+								{ transform: 'rotate(1.25deg)' },
+								{ transform: 'rotate(-1.25deg)' },
+								{ transform: 'rotate(1.25deg)' },
+							],
+							{
+								duration: 250,
+								iterations: 1,
+							}
+						);
+					}
+				});
+			}
+
+			function labelToId(label) {
+				return btoa(label);
+			}
+
+			function idToLabel(id) {
+				return atob(id);
+			}
+
 			createQuestionaireNodes();
-			updateHead(questionaire.head.value);
+			setQuestions(questionaire.head.value, true);
 
 			function updateNodeIndicator(questionaireHeadIndex, direction) {
 				let val;
@@ -210,19 +519,43 @@
 			}
 
 			function nextNode() {
+				const questionaireContainer = document.querySelector('#questionaireContainer');
+				const inputs = [...questionaireContainer.querySelectorAll('input')];
+
+				if (!validInputs(inputs)) {
+					throwErrorFlag(inputs);
+					return;
+				}
+
+				if (questionaire.head.next.next === null) document.querySelector('#nextNode').style.opacity = '70%';
+
 				if (questionaire.head.next === null) return;
+
+				document.querySelector('#previousNode').style.opacity = '100%';
 				questionaire.tail = questionaire.tail.prev ? questionaire.tail.prev : questionaire.tail;
 				questionaire.head = questionaire.head.next ? questionaire.head.next : questionaire.head;
-				updateHead(questionaire.head.value);
-				updateNodeIndicator(questionaire.head.value.index, 'next');
+
+				setQuestions(questionaire.head.value);
+				updateNodeIndicator(questionaire.head.value.labels[1], 'next');
 			}
 
 			function previousNode() {
+				const questionaireContainer = document.querySelector('#questionaireContainer');
+				const inputs = [...questionaireContainer.querySelectorAll('input')];
+
+				if (!validInputs(inputs)) {
+					throwErrorFlag(inputs);
+					return;
+				}
+
+				if (questionaire.tail.next.next === null) document.querySelector('#previousNode').style.opacity = '70%';
+
 				if (questionaire.tail.next === null) return;
+				document.querySelector('#nextNode').style.opacity = '100%';
 				questionaire.tail = questionaire.tail.next ? questionaire.tail.next : questionaire.tail;
 				questionaire.head = questionaire.head.prev ? questionaire.head.prev : questionaire.head;
-				updateHead(questionaire.head.value);
-				updateNodeIndicator(questionaire.head.value.index, 'previous');
+				setQuestions(questionaire.head.value);
+				updateNodeIndicator(questionaire.head.value.labels[1], 'previous');
 			}
 		</script>
 	</body>

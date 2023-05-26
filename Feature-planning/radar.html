@@ -194,8 +194,10 @@
 			document.querySelector('#export').onclick = function () {
 				const download = document.createElement('a');
 				download.href = radar.toBase64Image('image/png', 1);
+				const imageData = radar.toBase64Image();
+				console.log(imageData);
 				download.download = 'dev-profile.png';
-				download.click();
+				// download.click();
 			};
 			displayVals();
 		</script>
